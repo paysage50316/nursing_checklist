@@ -1,0 +1,418 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>간호사정 시뮬레이션 교육 체크리스트</title>
+<link href="https://fonts.googleapis.com/css2?family=Noto+Sans+KR:wght@300;400;500;600;700&family=JetBrains+Mono:wght@400;600&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --bg: #f0f4f8; --surface: #ffffff; --surface2: #f8fafc;
+    --border: #e2e8f0; --border-strong: #cbd5e1;
+    --text-primary: #1e293b; --text-secondary: #64748b; --text-muted: #94a3b8;
+    --accent: #1e3a5f;
+    --y-color: #16a34a; --y-bg: #dcfce7; --y-border: #86efac;
+    --n-color: #dc2626; --n-bg: #fee2e2; --n-border: #fca5a5;
+    --d-color: #d97706; --d-bg: #fef3c7; --d-border: #fcd34d;
+    --radius: 10px; --shadow: 0 1px 3px rgba(0,0,0,0.08);
+  }
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  body { font-family: 'Noto Sans KR', sans-serif; background: var(--bg); color: var(--text-primary); min-height: 100vh; line-height: 1.5; }
+
+  .site-header { background: var(--accent); color: #fff; padding: 20px 32px; display: flex; align-items: center; gap: 16px; box-shadow: 0 2px 8px rgba(0,0,0,0.2); }
+  .site-header .logo { width: 40px; height: 40px; background: rgba(255,255,255,0.15); border-radius: 8px; display: flex; align-items: center; justify-content: center; font-size: 20px; }
+  .site-header h1 { font-size: 18px; font-weight: 700; }
+  .site-header p { font-size: 12px; opacity: 0.65; margin-top: 2px; }
+  .header-badge { margin-left: auto; background: rgba(255,255,255,0.15); border: 1px solid rgba(255,255,255,0.25); color: #fff; font-size: 11px; padding: 4px 10px; border-radius: 20px; font-weight: 500; }
+
+  .main-wrap { max-width: 980px; margin: 0 auto; padding: 28px 24px 60px; display: grid; grid-template-columns: 230px 1fr; gap: 24px; align-items: start; }
+  .sidebar { position: sticky; top: 24px; display: flex; flex-direction: column; gap: 16px; }
+  .card { background: var(--surface); border: 1px solid var(--border); border-radius: var(--radius); box-shadow: var(--shadow); overflow: hidden; }
+  .card-header { padding: 13px 16px; border-bottom: 1px solid var(--border); background: var(--surface2); display: flex; align-items: center; gap: 8px; font-size: 13px; font-weight: 700; }
+  .card-body { padding: 14px 16px; }
+
+  .team-label { font-size: 12px; font-weight: 600; color: var(--text-secondary); margin-bottom: 6px; display: block; }
+  .team-input { width: 100%; padding: 9px 11px; border: 1.5px solid var(--border); border-radius: 8px; background: var(--surface2); font-family: inherit; font-size: 13px; color: var(--text-primary); outline: none; resize: none; min-height: 64px; line-height: 1.5; transition: border-color 0.15s; }
+  .team-input:focus { border-color: var(--accent); background: #fff; }
+  .team-input::placeholder { color: var(--text-muted); }
+  .char-count { font-size: 11px; color: var(--text-muted); text-align: right; margin-top: 3px; }
+  .char-count.warn { color: var(--n-color); }
+
+  .nav-tabs { display: flex; flex-direction: column; gap: 3px; padding: 8px; }
+  .nav-tab { padding: 8px 12px; border-radius: 7px; border: none; background: transparent; font-family: inherit; font-size: 12px; font-weight: 500; color: var(--text-secondary); cursor: pointer; text-align: left; transition: all 0.15s; }
+  .nav-tab:hover { background: var(--surface2); color: var(--text-primary); }
+  .nav-tab.active { background: var(--accent); color: #fff; }
+
+  .legend-grid { display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 6px; }
+  .legend-item { display: flex; flex-direction: column; align-items: center; gap: 3px; padding: 7px 4px; border-radius: 7px; font-size: 10px; font-weight: 600; text-align: center; }
+  .legend-y { background: var(--y-bg); color: var(--y-color); border: 1px solid var(--y-border); }
+  .legend-n { background: var(--n-bg); color: var(--n-color); border: 1px solid var(--n-border); }
+  .legend-d { background: var(--d-bg); color: var(--d-color); border: 1px solid var(--d-border); }
+  .legend-letter { font-size: 14px; font-weight: 800; font-family: 'JetBrains Mono', monospace; }
+
+  .submit-btn { width: 100%; padding: 11px; border: none; border-radius: 8px; background: var(--accent); color: #fff; font-family: inherit; font-size: 13px; font-weight: 700; cursor: pointer; display: flex; align-items: center; justify-content: center; gap: 6px; transition: background 0.15s; margin-top: 10px; }
+  .submit-btn:hover { background: #162d4a; }
+
+  .content-area { display: flex; flex-direction: column; gap: 20px; }
+
+  .summary-bar { background: var(--surface); border: 1px solid var(--border); border-radius: var(--radius); padding: 13px 18px; box-shadow: var(--shadow); display: flex; align-items: center; gap: 12px; flex-wrap: wrap; }
+  .summary-pills { display: flex; gap: 8px; }
+  .sp { padding: 4px 14px; border-radius: 20px; font-size: 13px; font-weight: 800; font-family: 'JetBrains Mono', monospace; }
+  .sp-y { background: var(--y-bg); color: var(--y-color); border: 1px solid var(--y-border); }
+  .sp-n { background: var(--n-bg); color: var(--n-color); border: 1px solid var(--n-border); }
+  .sp-d { background: var(--d-bg); color: var(--d-color); border: 1px solid var(--d-border); }
+  .summary-team { font-size: 12px; color: var(--text-secondary); margin-left: auto; }
+
+  .checklist-card { background: var(--surface); border: 1px solid var(--border); border-radius: var(--radius); box-shadow: var(--shadow); overflow: hidden; }
+  .checklist-header { padding: 13px 20px; border-bottom: 1px solid var(--border); display: flex; align-items: center; gap: 10px; }
+  .checklist-title { font-size: 14px; font-weight: 700; }
+  .reset-all-btn { margin-left: auto; padding: 5px 10px; border: 1px solid var(--border-strong); border-radius: 6px; background: var(--surface); font-family: inherit; font-size: 11px; font-weight: 600; color: var(--text-secondary); cursor: pointer; transition: all 0.15s; }
+  .reset-all-btn:hover { background: #fee2e2; border-color: #fca5a5; color: #dc2626; }
+
+  .table-wrapper { overflow-x: auto; }
+  table { width: 100%; border-collapse: collapse; font-size: 13px; }
+  thead th { padding: 9px 14px; background: var(--surface2); font-weight: 600; font-size: 11px; color: var(--text-secondary); border-bottom: 2px solid var(--border-strong); text-align: center; white-space: nowrap; }
+  thead th.col-num { width: 46px; }
+  thead th.col-content { text-align: left; }
+  thead th.col-ynd { width: 108px; }
+
+  tr.sec-header td { background: #f1f5f9; padding: 6px 14px; border-top: 2px solid var(--border-strong); border-bottom: 1px solid var(--border); }
+  .sec-badge { display: inline-block; padding: 2px 10px; border-radius: 10px; font-size: 11px; font-weight: 700; }
+
+  tbody tr { border-bottom: 1px solid var(--border); transition: background 0.1s; }
+  tbody tr:hover:not(.sec-header) { background: #f8fafc; }
+  td { padding: 9px 14px; vertical-align: middle; }
+  td.num-cell { text-align: center; font-family: 'JetBrains Mono', monospace; font-size: 12px; font-weight: 600; color: var(--text-muted); background: var(--surface2); }
+  td.content-cell { line-height: 1.55; }
+  td.check-cell { text-align: center; }
+
+  .ynd-group { display: flex; gap: 4px; justify-content: center; }
+  .check-btn { width: 30px; height: 28px; border-radius: 6px; border: 1.5px solid var(--border-strong); background: var(--surface); font-family: 'JetBrains Mono', monospace; font-size: 11px; font-weight: 700; cursor: pointer; color: var(--text-muted); transition: all 0.13s; display: flex; align-items: center; justify-content: center; }
+  .check-btn.active-y { background: var(--y-bg); border-color: var(--y-border); color: var(--y-color); }
+  .check-btn.active-n { background: var(--n-bg); border-color: var(--n-border); color: var(--n-color); }
+  .check-btn.active-d { background: var(--d-bg); border-color: var(--d-border); color: var(--d-color); }
+
+  .memo-section { background: var(--surface); border: 1px solid var(--border); border-radius: var(--radius); box-shadow: var(--shadow); overflow: hidden; }
+  .memo-header { padding: 13px 20px; border-bottom: 1px solid var(--border); font-size: 14px; font-weight: 700; display: flex; align-items: center; gap: 8px; }
+  .memo-body { padding: 16px 20px; }
+  .memo-area { width: 100%; padding: 10px 12px; border: 1.5px solid var(--border); border-radius: 8px; background: var(--surface2); font-family: inherit; font-size: 13px; color: var(--text-primary); resize: vertical; min-height: 90px; line-height: 1.5; transition: border-color 0.15s; }
+  .memo-area:focus { outline: none; border-color: var(--accent); background: #fff; }
+  .memo-area::placeholder { color: var(--text-muted); }
+
+  .modal-overlay { position: fixed; inset: 0; background: rgba(0,0,0,0.45); display: flex; align-items: center; justify-content: center; z-index: 1000; padding: 24px; backdrop-filter: blur(3px); }
+  .modal-overlay.hidden { display: none; }
+  .modal-box { background: var(--surface); border-radius: 14px; box-shadow: 0 20px 60px rgba(0,0,0,0.25); width: 100%; max-width: 500px; max-height: 85vh; display: flex; flex-direction: column; overflow: hidden; }
+  .modal-header { padding: 20px 24px 16px; border-bottom: 1px solid var(--border); display: flex; align-items: center; gap: 10px; }
+  .modal-header h2 { font-size: 16px; font-weight: 700; flex: 1; }
+  .modal-close { width: 30px; height: 30px; border-radius: 50%; border: none; background: var(--surface2); font-size: 16px; cursor: pointer; color: var(--text-secondary); display: flex; align-items: center; justify-content: center; }
+  .modal-close:hover { background: var(--n-bg); color: var(--n-color); }
+  .modal-body { padding: 20px 24px; overflow-y: auto; display: flex; flex-direction: column; gap: 16px; }
+  .result-team { font-size: 13px; color: var(--text-secondary); background: var(--surface2); padding: 10px 14px; border-radius: 8px; border-left: 3px solid var(--accent); line-height: 1.6; }
+  .result-row { display: flex; align-items: center; gap: 10px; flex-wrap: wrap; }
+  .result-label { font-size: 13px; font-weight: 700; }
+  .result-pills { display: flex; gap: 8px; }
+  .rp { padding: 6px 18px; border-radius: 20px; font-size: 15px; font-weight: 800; font-family: 'JetBrains Mono', monospace; }
+  .rp-y { background: var(--y-bg); color: var(--y-color); border: 1.5px solid var(--y-border); }
+  .rp-n { background: var(--n-bg); color: var(--n-color); border: 1.5px solid var(--n-border); }
+  .rp-d { background: var(--d-bg); color: var(--d-color); border: 1.5px solid var(--d-border); }
+  .result-memo { padding: 10px 14px; background: var(--surface2); border-left: 3px solid var(--accent); border-radius: 0 6px 6px 0; font-size: 12px; color: var(--text-secondary); line-height: 1.6; white-space: pre-wrap; }
+  .result-memo-label { font-size: 11px; font-weight: 700; color: var(--accent); margin-bottom: 4px; display: block; }
+
+  .hidden { display: none !important; }
+
+  /* 미체크 행 강조 */
+  tr.row-missing td { background: #fff5f5 !important; }
+  tr.row-missing td.num-cell { background: #fee2e2 !important; color: var(--n-color) !important; }
+  tr.row-missing td.content-cell { color: var(--n-color); }
+
+  /* 검증 알림 토스트 */
+  .toast {
+    position: fixed; bottom: 32px; left: 50%; transform: translateX(-50%);
+    background: #1e293b; color: #fff;
+    padding: 12px 22px; border-radius: 10px;
+    font-size: 13px; font-weight: 600;
+    box-shadow: 0 8px 24px rgba(0,0,0,0.25);
+    z-index: 2000; display: flex; align-items: center; gap: 8px;
+    animation: slideUp 0.25s ease;
+  }
+  @keyframes slideUp { from { opacity:0; transform: translateX(-50%) translateY(16px); } to { opacity:1; transform: translateX(-50%) translateY(0); } }
+
+  @media (max-width: 800px) { .main-wrap { grid-template-columns: 1fr; } .sidebar { position: static; } }
+</style>
+</head>
+<body>
+
+<header class="site-header">
+  <div class="logo">🏥</div>
+  <div>
+    <h1>간호사정 시뮬레이션 교육 체크리스트</h1>
+    <p>간호부문 공통 신입간호사 스타트(입문)교육</p>
+  </div>
+  <span class="header-badge">Y · N · D</span>
+</header>
+
+<div class="main-wrap">
+  <aside class="sidebar">
+    <div class="card">
+      <div class="card-header">👥 교육생 명단</div>
+      <div class="card-body">
+        <span class="team-label">강사명 (최대 5자)</span>
+        <input class="team-input" id="instructorInput" type="text" maxlength="5" placeholder="강사명 입력"
+          style="min-height:unset;height:38px;resize:none;padding:8px 11px"
+          oninput="onInstructorInput()">
+        <span class="team-label" style="margin-top:10px">교육생 이름 (최대 40자, 여러 명 가능)</span>
+        <textarea class="team-input" id="teamInput" maxlength="40" placeholder="예) 김지수, 이민준, 박서연" oninput="onTeamInput()"></textarea>
+        <div class="char-count" id="charCount">0 / 40</div>
+        <button class="submit-btn" onclick="openResult()">📋 결과 제출</button>
+      </div>
+    </div>
+
+    <div class="card">
+      <div class="card-header">📋 섹션 이동</div>
+      <div class="nav-tabs">
+        <button class="nav-tab active" onclick="goToSection('checklist-card',this)">🔵 모든 상황</button>
+        <button class="nav-tab" onclick="goToSection('sec-s1',this)">📊 통증 평가</button>
+        <button class="nav-tab" onclick="goToSection('sec-s2',this)">⚠️ 낙상위험도 평가</button>
+        <button class="nav-tab" onclick="goToSection('sec-s3',this)">🩹 욕창위험도 평가</button>
+        <button class="nav-tab" onclick="goToSection('memo-section',this)">📝 메모</button>
+      </div>
+    </div>
+
+    <div class="card">
+      <div class="card-header">ℹ️ 체크 기준</div>
+      <div class="card-body">
+        <div class="legend-grid">
+          <div class="legend-item legend-y"><span class="legend-letter">Y</span>예 (수행)</div>
+          <div class="legend-item legend-n"><span class="legend-letter">N</span>아니오</div>
+          <div class="legend-item legend-d"><span class="legend-letter">D</span>디브리핑</div>
+        </div>
+        <p style="font-size:11px;color:var(--text-muted);margin-top:10px;line-height:1.6">
+          • 기회가 주어진 항목에만 체크<br>
+          • Y+D 또는 N+D 동시 체크 가능<br>
+          • 버튼 재클릭 시 선택 해제
+        </p>
+      </div>
+    </div>
+  </aside>
+
+  <main class="content-area">
+
+    <div class="summary-bar">
+      <div class="summary-pills">
+        <span class="sp sp-y" id="total-y">Y 0</span>
+        <span class="sp sp-n" id="total-n">N 0</span>
+        <span class="sp sp-d" id="total-d">D 0</span>
+      </div>
+      <span class="summary-team" id="summaryTeam">교육생 명단을 입력해 주세요</span>
+    </div>
+
+    <div class="checklist-card" id="checklist-card">
+      <div class="checklist-header">
+        <span class="checklist-title">📋 체크리스트 (총 15개)</span>
+        <button class="reset-all-btn" onclick="resetAll()">전체 초기화</button>
+      </div>
+      <div class="table-wrapper">
+        <table>
+          <thead>
+            <tr>
+              <th class="col-num">연번</th>
+              <th class="col-content">내용</th>
+              <th class="col-ynd">Y / N / D</th>
+            </tr>
+          </thead>
+          <tbody id="checklistBody"></tbody>
+        </table>
+      </div>
+    </div>
+
+    <div class="memo-section" id="memo-section">
+      <div class="memo-header">📝 메모</div>
+      <div class="memo-body">
+        <textarea class="memo-area" id="memoText" placeholder="메모를 입력하세요..."></textarea>
+      </div>
+    </div>
+
+  </main>
+</div>
+
+<div class="modal-overlay hidden" id="resultModal" onclick="closeResultOnOverlay(event)">
+  <div class="modal-box">
+    <div class="modal-header">
+      <span style="font-size:20px">📋</span>
+      <h2>간호사정 체크리스트 결과&nbsp;<span id="resultDate" style="font-size:13px;font-weight:500;color:var(--text-secondary)"></span></h2>
+      <button class="modal-close" onclick="closeResult()">✕</button>
+    </div>
+    <div class="modal-body" id="resultBody"></div>
+  </div>
+</div>
+
+<script>
+const ITEMS = [
+  {num:1,  sec:'모든 상황', scBg:'#e0f2fe', scTx:'#0369a1', text:'첫만남 자기소개를 한다.'},
+  {num:2,  sec:null, text:'손위생을 수행한다.'},
+  {num:3,  sec:null, text:'개방형으로 환자 확인을 한다.'},
+  {num:4,  sec:null, text:'의사소통 시 타인의 표현을 이해하고, 자신의 의사를 전달한다.'},
+  {num:5,  sec:null, text:'입원간호정보조사지를 작성한다.'},
+  {num:6,  sec:'통증 평가', scBg:'#dcfce7', scTx:'#16a34a', text:'통증 유무를 사정한다.'},
+  {num:7,  sec:null, text:'대상자에 따른 적절한 통증 평가도구(NRS, FPRS, FLACC, NIPS, CNPS)를 적용한다.'},
+  {num:8,  sec:null, text:'통증 평가에 포함되는 항목을 사정한다. (부위, 강도, 양상, 빈도, 기간)'},
+  {num:9,  sec:'낙상위험도 평가', scBg:'#fce7f3', scTx:'#9d174d', text:'대상자에 따른 적절한 낙상위험도 평가항목과 그 기준을 이해한다.'},
+  {num:10, sec:null, text:'대상자에 따른 적절한 낙상위험도 평가 도구(Morse Fall Scale, SNUCH Fall Scale)를 적용한다.'},
+  {num:11, sec:null, text:'낙상고위험군 대상자에게 고위험군 조치사항을 설명한다.'},
+  {num:12, sec:null, text:'환자에게 낙상예방활동을 설명한다.'},
+  {num:13, sec:'욕창위험도 평가', scBg:'#fef3c7', scTx:'#d97706', text:'대상자에 따른 적절한 욕창위험도 평가항목과 그 기준을 이해한다.'},
+  {num:14, sec:null, text:'대상자에 따른 적절한 욕창위험도 평가 도구(Braden Scale, Neonatal Skin Risk Assessment Scale)를 적용한다.'},
+  {num:15, sec:null, text:'환자에게 욕창예방활동을 설명한다.'},
+];
+
+const SEC_IDS = {'통증 평가':'sec-s1','낙상위험도 평가':'sec-s2','욕창위험도 평가':'sec-s3',
+  '상황① C-line 삽입 시술 전후':   'sec-s1',
+  '상황② 중심정맥관 사용':          'sec-s2',
+  '상황③ 수혈':                     'sec-s3',
+  '상황④ 수혈부작용':               'sec-s4',
+  '상황⑤ 의사소통(문제상황대처)':   'sec-s5',
+  '상황⑥ 투약':                     'sec-s6',
+};
+
+let checks = {};
+function getCell(n) { if (!checks[n]) checks[n]={Y:false,N:false,D:false}; return checks[n]; }
+function countAll(v) { return Object.values(checks).filter(c=>c[v]).length; }
+
+function toggle(num, val) {
+  const c = getCell(num);
+  if (val==='Y')      { c.Y=!c.Y; if(c.Y) c.N=false; }
+  else if (val==='N') { c.N=!c.N; if(c.N) c.Y=false; }
+  else                { c.D=!c.D; }
+  ['Y','N','D'].forEach(v => {
+    const b = document.getElementById('btn-'+num+'-'+v);
+    if (b) b.className = 'check-btn' + (c[v]?' active-'+v.toLowerCase():'');
+  });
+  // 체크 시 미체크 강조 해제
+  const anyChecked = c.Y || c.N || c.D;
+  const btn = document.getElementById('btn-'+num+'-Y');
+  if (btn) {
+    const row = btn.closest('tr');
+    if (anyChecked) row.classList.remove('row-missing');
+  }
+  updateTotals();
+}
+
+function updateTotals() {
+  document.getElementById('total-y').textContent = 'Y '+countAll('Y');
+  document.getElementById('total-n').textContent = 'N '+countAll('N');
+  document.getElementById('total-d').textContent = 'D '+countAll('D');
+}
+
+function renderTable() {
+  const tbody = document.getElementById('checklistBody');
+  let html = '';
+  ITEMS.forEach(item => {
+    if (item.sec) {
+      const anchorId = SEC_IDS[item.sec] ? ' id="'+SEC_IDS[item.sec]+'"' : '';
+      html += '<tr class="sec-header"'+anchorId+'><td colspan="3"><span class="sec-badge" style="background:'+item.scBg+';color:'+item.scTx+'">'+item.sec+'</span></td></tr>';
+    }
+    const c = getCell(item.num);
+    html += '<tr>'
+      + '<td class="num-cell">'+item.num+'</td>'
+      + '<td class="content-cell">'+item.text+'</td>'
+      + '<td class="check-cell"><div class="ynd-group">'
+      + '<button id="btn-'+item.num+'-Y" class="check-btn'+(c.Y?' active-y':'')+'" onclick="toggle('+item.num+',\'Y\')">Y</button>'
+      + '<button id="btn-'+item.num+'-N" class="check-btn'+(c.N?' active-n':'')+'" onclick="toggle('+item.num+',\'N\')">N</button>'
+      + '<button id="btn-'+item.num+'-D" class="check-btn'+(c.D?' active-d':'')+'" onclick="toggle('+item.num+',\'D\')">D</button>'
+      + '</div></td></tr>';
+  });
+  tbody.innerHTML = html;
+}
+
+function resetAll() {
+  if (!confirm('모든 체크를 초기화하시겠습니까?')) return;
+  checks = {};
+  renderTable();
+  updateTotals();
+}
+
+function onTeamInput() {
+  const val = document.getElementById('teamInput').value;
+  const cc = document.getElementById('charCount');
+  cc.textContent = val.length+' / 40';
+  cc.className = 'char-count'+(val.length>=36?' warn':'');
+  document.getElementById('summaryTeam').textContent = val.trim() ? '👥 '+val.trim() : '교육생 명단을 입력해 주세요';
+}
+
+function onInstructorInput() {}
+
+function goToSection(id, btn) {
+  const el = document.getElementById(id);
+  if (!el) return;
+  el.scrollIntoView({behavior:'smooth',block:'start'});
+  document.querySelectorAll('.nav-tab').forEach(t=>t.classList.remove('active'));
+  btn.classList.add('active');
+}
+
+let toastTimer = null;
+function showToast(msg) {
+  const old = document.getElementById('validToast');
+  if (old) old.remove();
+  if (toastTimer) clearTimeout(toastTimer);
+  const t = document.createElement('div');
+  t.id = 'validToast';
+  t.className = 'toast';
+  t.innerHTML = '⚠️ ' + msg;
+  document.body.appendChild(t);
+  toastTimer = setTimeout(() => t.remove(), 3500);
+}
+
+function openResult() {
+  // 미체크 항목 찾기 (sec-header 행 제외, 실제 데이터 행만)
+  const unchecked = ITEMS.filter(item => {
+    const c = checks[item.num];
+    return !c || (!c.Y && !c.N && !c.D);
+  });
+
+  // 기존 강조 초기화
+  document.querySelectorAll('tr.row-missing').forEach(r => r.classList.remove('row-missing'));
+
+  if (unchecked.length > 0) {
+    // 미체크 행 강조
+    unchecked.forEach(item => {
+      const btns = document.getElementById('btn-'+item.num+'-Y');
+      if (btns) btns.closest('tr').classList.add('row-missing');
+    });
+    // 첫 번째 미체크 항목으로 스크롤
+    const firstBtn = document.getElementById('btn-'+unchecked[0].num+'-Y');
+    if (firstBtn) firstBtn.closest('tr').scrollIntoView({behavior:'smooth', block:'center'});
+    showToast(`미체크 항목이 ${unchecked.length}개 있습니다. (연번 ${unchecked.map(i=>i.num).join(', ')})`);
+    return;
+  }
+
+  const today = new Date();
+  document.getElementById('resultDate').textContent =
+    today.getFullYear()+'-'+String(today.getMonth()+1).padStart(2,'0')+'-'+String(today.getDate()).padStart(2,'0');
+  const instructor = document.getElementById('instructorInput').value.trim();
+  const team = document.getElementById('teamInput').value.trim();
+  const memo = document.getElementById('memoText').value.trim();
+  const y=countAll('Y'), n=countAll('N'), d=countAll('D');
+  let html = '';
+  if (instructor || team) {
+    html += '<div class="result-team">'
+      + (instructor ? '<strong>🎓 강사</strong>&nbsp;&nbsp;'+instructor.replace(/</g,'&lt;')+'<br>' : '')
+      + (team ? '<strong>👥 교육생</strong>&nbsp;&nbsp;'+team.replace(/</g,'&lt;') : '')
+      + '</div>';
+  }
+  html += '<div class="result-row"><span class="result-label">전체 합계</span><div class="result-pills">'
+    +'<span class="rp rp-y">Y '+y+'</span>'
+    +'<span class="rp rp-n">N '+n+'</span>'
+    +'<span class="rp rp-d">D '+d+'</span>'
+    +'</div></div>';
+  if (memo) html += '<div class="result-memo"><span class="result-memo-label">📝 메모</span>'+memo.replace(/</g,'&lt;').replace(/>/g,'&gt;')+'</div>';
+  document.getElementById('resultBody').innerHTML = html;
+  document.getElementById('resultModal').classList.remove('hidden');
+}
+
+function closeResult() { document.getElementById('resultModal').classList.add('hidden'); }
+function closeResultOnOverlay(e) { if(e.target===document.getElementById('resultModal')) closeResult(); }
+
+renderTable();
+</script>
+</body>
+</html>

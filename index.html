@@ -1,0 +1,366 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>SNUH 신입간호사 입문교육 시뮬레이션 체크리스트</title>
+<link href="https://fonts.googleapis.com/css2?family=Noto+Sans+KR:wght@300;400;500;600;700&family=Noto+Serif+KR:wght@600;700&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --bg: #f0f4f8;
+    --surface: #fff;
+    --surface2: #f8fafc;
+    --border: #e2e8f0;
+    --accent: #1e3a5f;
+    --text-primary: #1e293b;
+    --text-secondary: #64748b;
+    --text-muted: #94a3b8;
+    --radius: 12px;
+    --shadow: 0 2px 8px rgba(0,0,0,0.07);
+    --shadow-hover: 0 8px 24px rgba(0,0,0,0.13);
+    --day4: #0e7490;
+    --day4-light: #e0f7fa;
+    --day5: #7c3aed;
+    --day5-light: #f3e8ff;
+  }
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  body { font-family: 'Noto Sans KR', sans-serif; background: var(--bg); color: var(--text-primary); min-height: 100vh; }
+
+  .site-header {
+    background: var(--accent); color: #fff;
+    padding: 32px 40px 0;
+    text-align: center; position: relative; overflow: hidden;
+  }
+  .site-header::before {
+    content: ''; position: absolute; inset: 0;
+    background: repeating-linear-gradient(45deg, transparent, transparent 60px,
+      rgba(255,255,255,0.03) 60px, rgba(255,255,255,0.03) 120px);
+  }
+  .header-logo {
+    width: 54px; height: 54px; background: rgba(255,255,255,0.15);
+    border-radius: 14px; display: flex; align-items: center;
+    justify-content: center; font-size: 24px;
+    margin: 0 auto 14px; position: relative;
+  }
+  .site-header h1 {
+    font-family: 'Noto Serif KR', serif;
+    font-size: 21px; font-weight: 700; position: relative;
+  }
+  .site-header p { font-size: 12px; opacity: 0.65; margin-top: 5px; position: relative; }
+  .header-date {
+    display: inline-block; margin-top: 12px;
+    background: rgba(255,255,255,0.15);
+    border: 1px solid rgba(255,255,255,0.25);
+    padding: 3px 14px; border-radius: 20px;
+    font-size: 12px; position: relative;
+  }
+
+  /* DAY TABS — part of header */
+  .day-tabs {
+    display: flex; gap: 8px;
+    justify-content: center;
+    padding: 20px 24px 0;
+    position: relative;
+  }
+  .day-tab {
+    padding: 11px 28px; border: none;
+    border-radius: 10px 10px 0 0;
+    font-family: inherit; font-size: 14px; font-weight: 700;
+    cursor: pointer; transition: all 0.2s;
+    display: flex; align-items: center; gap: 8px;
+    color: rgba(255,255,255,0.55);
+    background: rgba(255,255,255,0.08);
+  }
+  .day-tab:hover { background: rgba(255,255,255,0.15); color: #fff; }
+  .day-tab.active-4 { background: var(--day4-light); color: var(--day4); }
+  .day-tab.active-5 { background: var(--day5-light); color: var(--day5); }
+  .tab-badge {
+    font-size: 10px; font-weight: 700;
+    padding: 1px 7px; border-radius: 10px;
+    background: rgba(255,255,255,0.25); color: inherit;
+  }
+  .day-tab.active-4 .tab-badge { background: rgba(14,116,144,0.15); }
+  .day-tab.active-5 .tab-badge { background: rgba(124,58,237,0.15); }
+
+  /* MAIN */
+  .container { max-width: 860px; margin: 0 auto; padding: 28px 24px 60px; }
+
+  .day-panel { display: none; }
+  .day-panel.active { display: block; }
+
+  .day-banner {
+    border-radius: var(--radius); padding: 14px 20px;
+    margin-bottom: 26px;
+    display: flex; align-items: center; gap: 12px;
+  }
+  .day-banner.d4 { background: var(--day4-light); border: 1.5px solid #67e8f9; }
+  .day-banner.d5 { background: var(--day5-light); border: 1.5px solid #c4b5fd; }
+  .banner-icon {
+    width: 42px; height: 42px; border-radius: 11px; flex-shrink: 0;
+    display: flex; align-items: center; justify-content: center; font-size: 20px;
+  }
+  .d4 .banner-icon { background: rgba(14,116,144,0.12); }
+  .d5 .banner-icon { background: rgba(124,58,237,0.12); }
+  .banner-title { font-size: 15px; font-weight: 700; }
+  .d4 .banner-title { color: var(--day4); }
+  .d5 .banner-title { color: var(--day5); }
+  .banner-sub { font-size: 11px; color: var(--text-secondary); margin-top: 2px; }
+
+  .section { margin-bottom: 28px; }
+  .section-header {
+    display: flex; align-items: center; gap: 8px;
+    margin-bottom: 12px; padding-bottom: 10px;
+    border-bottom: 1.5px solid var(--border);
+  }
+  .time-badge {
+    padding: 3px 11px; border-radius: 20px;
+    font-size: 11px; font-weight: 700; border: 1px solid; white-space: nowrap;
+  }
+  .badge-am    { background: #fef9e7; color: #b7860b; border-color: #f9d423; }
+  .badge-pm    { background: #e0f2fe; color: #0369a1; border-color: #bae6fd; }
+  .badge-etc   { background: #f3e8ff; color: #7c3aed; border-color: #c4b5fd; }
+  .badge-emg   { background: #fee2e2; color: #dc2626; border-color: #fca5a5; }
+  .badge-theme { background: #dcfce7; color: #16a34a; border-color: #86efac; }
+  .badge-surg  { background: #ede9fe; color: #7c3aed; border-color: #c4b5fd; }
+
+  .section-title { font-size: 13px; font-weight: 700; }
+  .section-count { margin-left: auto; font-size: 10px; color: var(--text-muted); background: var(--surface2); border: 1px solid var(--border); padding: 2px 7px; border-radius: 10px; }
+
+  .card-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(235px, 1fr)); gap: 12px; }
+
+  .checklist-card {
+    background: var(--surface); border: 1px solid var(--border);
+    border-radius: var(--radius); box-shadow: var(--shadow);
+    text-decoration: none; color: inherit;
+    display: flex; flex-direction: column; transition: all 0.2s; overflow: hidden;
+  }
+  .checklist-card:hover { transform: translateY(-3px); box-shadow: var(--shadow-hover); border-color: var(--accent); }
+  .checklist-card:hover .card-arrow { opacity: 1; transform: translateX(0); }
+
+  .card-top { padding: 14px 15px 10px; display: flex; align-items: flex-start; gap: 10px; }
+  .card-icon { width: 36px; height: 36px; flex-shrink: 0; border-radius: 9px; display: flex; align-items: center; justify-content: center; font-size: 16px; }
+  .card-info { flex: 1; min-width: 0; }
+  .card-title { font-size: 13px; font-weight: 700; line-height: 1.35; }
+  .card-sub { font-size: 11px; color: var(--text-muted); margin-top: 3px; line-height: 1.4; }
+
+  .card-bottom { padding: 7px 15px; border-top: 1px solid var(--border); background: var(--surface2); display: flex; align-items: center; justify-content: space-between; }
+  .card-badge { font-size: 10px; font-weight: 700; padding: 2px 7px; border-radius: 8px; border: 1px solid; }
+  .card-arrow { font-size: 12px; color: var(--text-muted); opacity: 0; transform: translateX(-4px); transition: all 0.2s; }
+
+  .cb-orange { background: #fef3c7; color: #d97706; border-color: #fcd34d; }
+  .cb-red    { background: #fee2e2; color: #dc2626; border-color: #fca5a5; }
+  .cb-teal   { background: #ccfbf1; color: #0f766e; border-color: #5eead4; }
+  .cb-blue   { background: #e0f2fe; color: #0369a1; border-color: #bae6fd; }
+  .cb-green  { background: #dcfce7; color: #16a34a; border-color: #86efac; }
+  .cb-purple { background: #ede9fe; color: #7c3aed; border-color: #c4b5fd; }
+  .cb-gold   { background: #fef9e7; color: #b7860b; border-color: #f9d423; }
+
+  .ci-orange { background: #fef3c7; }
+  .ci-red    { background: #fee2e2; }
+  .ci-teal   { background: #ccfbf1; }
+  .ci-blue   { background: #e0f2fe; }
+  .ci-green  { background: #dcfce7; }
+  .ci-purple { background: #ede9fe; }
+  .ci-gold   { background: #fef9e7; }
+
+  .footer { text-align: center; padding: 20px; font-size: 12px; color: var(--text-muted); border-top: 1px solid var(--border); }
+
+  @media (max-width: 560px) {
+    .card-grid { grid-template-columns: 1fr; }
+    .site-header { padding: 24px 20px 0; }
+    .site-header h1 { font-size: 17px; }
+    .day-tab { padding: 10px 18px; font-size: 13px; }
+  }
+</style>
+</head>
+<body>
+
+<header class="site-header">
+  <div class="header-logo">🏥</div>
+  <h1>SNUH 신입간호사 입문교육</h1>
+  <p>시뮬레이션 체크리스트 모음</p>
+  <div class="header-date" id="headerDate"></div>
+  <div class="day-tabs">
+    <button class="day-tab active-4" id="tab4" onclick="switchDay(4)">
+      🏥 4일차 <span class="tab-badge">7개</span>
+    </button>
+    <button class="day-tab" id="tab5" onclick="switchDay(5)">
+      🚨 5일차 <span class="tab-badge">7개</span>
+    </button>
+  </div>
+</header>
+
+<div class="container">
+
+  <!-- ══════════ 4일차 ══════════ -->
+  <div class="day-panel active" id="panel4">
+    <div class="day-banner d4">
+      <div class="banner-icon">📅</div>
+      <div>
+        <div class="banner-title">4일차 시뮬레이션</div>
+        <div class="banner-sub">투약 · 수혈 · 기본간호 · 간호사정</div>
+      </div>
+    </div>
+
+    <div class="section">
+      <div class="section-header">
+        <span class="time-badge badge-am">🌤 오전</span>
+        <span class="section-title">투약 · 수혈</span>
+        <span class="section-count">3개</span>
+      </div>
+      <div class="card-grid">
+        <a class="checklist-card" href="checklist_투약1.html">
+          <div class="card-top"><div class="card-icon ci-orange">💊</div><div class="card-info"><div class="card-title">투약 1</div><div class="card-sub">Nexium · Ambroxol · Cefazolin (IV)</div></div></div>
+          <div class="card-bottom"><span class="card-badge cb-orange">27개 항목 · 전체 필수</span><span class="card-arrow">→</span></div>
+        </a>
+        <a class="checklist-card" href="checklist_투약2.html">
+          <div class="card-top"><div class="card-icon ci-orange">🩸</div><div class="card-info"><div class="card-title">투약 2</div><div class="card-sub">SC · PO · PRN IM 투약</div></div></div>
+          <div class="card-bottom"><span class="card-badge cb-orange">20개 항목 · 전체 필수</span><span class="card-arrow">→</span></div>
+        </a>
+        <a class="checklist-card" href="checklist_수혈.html">
+          <div class="card-top"><div class="card-icon ci-red">🩺</div><div class="card-info"><div class="card-title">수혈</div><div class="card-sub">수혈 전 준비 · 시행 · 부작용 · 기록</div></div></div>
+          <div class="card-bottom"><span class="card-badge cb-red">17개 항목 · 전체 필수</span><span class="card-arrow">→</span></div>
+        </a>
+      </div>
+    </div>
+
+    <div class="section">
+      <div class="section-header">
+        <span class="time-badge badge-pm">🌇 오후</span>
+        <span class="section-title">기본간호 · 간호사정</span>
+        <span class="section-count">3개</span>
+      </div>
+      <div class="card-grid">
+        <a class="checklist-card" href="checklist_기본간호1.html">
+          <div class="card-top"><div class="card-icon ci-teal">🫁</div><div class="card-info"><div class="card-title">기본간호 1</div><div class="card-sub">흡인 · 중심정맥관 Locking/Unlocking</div></div></div>
+          <div class="card-bottom"><span class="card-badge cb-teal">최대 6인 · 3섹션</span><span class="card-arrow">→</span></div>
+        </a>
+        <a class="checklist-card" href="checklist_기본간호2.html">
+          <div class="card-top"><div class="card-icon ci-teal">🍶</div><div class="card-info"><div class="card-title">기본간호 2</div><div class="card-sub">경관영양 · 유치도뇨</div></div></div>
+          <div class="card-bottom"><span class="card-badge cb-teal">최대 6인 · 2섹션</span><span class="card-arrow">→</span></div>
+        </a>
+        <a class="checklist-card" href="checklist_간호사정.html">
+          <div class="card-top"><div class="card-icon ci-blue">📋</div><div class="card-info"><div class="card-title">간호사정</div><div class="card-sub">통증 평가 · 낙상위험도 · 욕창위험도</div></div></div>
+          <div class="card-bottom"><span class="card-badge cb-blue">15개 항목 · 전체 필수</span><span class="card-arrow">→</span></div>
+        </a>
+      </div>
+    </div>
+
+    <div class="section">
+      <div class="section-header">
+        <span class="time-badge badge-etc">📝 기타</span>
+        <span class="section-title">교수자 도구</span>
+        <span class="section-count">1개</span>
+      </div>
+      <div class="card-grid">
+        <a class="checklist-card" href="self_check_교수자.html">
+          <div class="card-top"><div class="card-icon ci-gold">🎓</div><div class="card-info"><div class="card-title">교수자로서의 자기 점검표</div><div class="card-sub">강의 역량 자기 평가 (5점 척도)</div></div></div>
+          <div class="card-bottom"><span class="card-badge cb-gold">20개 문항 · 총점 100점</span><span class="card-arrow">→</span></div>
+        </a>
+      </div>
+    </div>
+  </div>
+
+  <!-- ══════════ 5일차 ══════════ -->
+  <div class="day-panel" id="panel5">
+    <div class="day-banner d5">
+      <div class="banner-icon">📅</div>
+      <div>
+        <div class="banner-title">5일차 시뮬레이션</div>
+        <div class="banner-sub">응급간호 · 종합테마 · 수술테마</div>
+      </div>
+    </div>
+
+    <div class="section">
+      <div class="section-header">
+        <span class="time-badge badge-emg">🚨 응급간호 술기</span>
+        <span class="section-count">3개</span>
+      </div>
+      <div class="card-grid">
+        <a class="checklist-card" href="checklist_BLS.html">
+          <div class="card-top"><div class="card-icon ci-red">❤️</div><div class="card-info"><div class="card-title">BLS (가슴압박)</div><div class="card-sub">응급간호 술기 — 가슴압박</div></div></div>
+          <div class="card-bottom"><span class="card-badge cb-red">15개 항목 · 전체 필수</span><span class="card-arrow">→</span></div>
+        </a>
+        <a class="checklist-card" href="checklist_제세동기.html">
+          <div class="card-top"><div class="card-icon ci-red">⚡</div><div class="card-info"><div class="card-title">제세동기</div><div class="card-sub">응급간호 술기 — 제세동기 사용법</div></div></div>
+          <div class="card-bottom"><span class="card-badge cb-red">12개 항목 · 전체 필수</span><span class="card-arrow">→</span></div>
+        </a>
+        <a class="checklist-card" href="checklist_시뮬레이션.html">
+          <div class="card-top"><div class="card-icon ci-red">🔴</div><div class="card-info"><div class="card-title">응급간호 종합시뮬레이션</div><div class="card-sub">BLS · ACLS (1조/2조) · ROSC</div></div></div>
+          <div class="card-bottom"><span class="card-badge cb-red">29개 항목 · 1조·2조 분리</span><span class="card-arrow">→</span></div>
+        </a>
+      </div>
+    </div>
+
+    <div class="section">
+      <div class="section-header">
+        <span class="time-badge badge-theme">📋 종합테마</span>
+        <span class="section-count">2개</span>
+      </div>
+      <div class="card-grid">
+        <a class="checklist-card" href="checklist_종합테마1.html">
+          <div class="card-top"><div class="card-icon ci-green">🩺</div><div class="card-info"><div class="card-title">종합테마 1</div><div class="card-sub">C-line · 수혈 · 투약 · 의사소통</div></div></div>
+          <div class="card-bottom"><span class="card-badge cb-green">29개 항목 · 전체 필수</span><span class="card-arrow">→</span></div>
+        </a>
+        <a class="checklist-card" href="checklist_종합테마2.html">
+          <div class="card-top"><div class="card-icon ci-green">💊</div><div class="card-info"><div class="card-title">종합테마 2</div><div class="card-sub">통증 사정 · 중재 · 재사정 · 환자 응대</div></div></div>
+          <div class="card-bottom"><span class="card-badge cb-green">17개 항목 · 전체 필수</span><span class="card-arrow">→</span></div>
+        </a>
+      </div>
+    </div>
+
+    <div class="section">
+      <div class="section-header">
+        <span class="time-badge badge-surg">🔪 수술테마</span>
+        <span class="section-count">2개</span>
+      </div>
+      <div class="card-grid">
+        <a class="checklist-card" href="checklist_수술테마1.html">
+          <div class="card-top"><div class="card-icon ci-purple">🏥</div><div class="card-info"><div class="card-title">수술테마 1</div><div class="card-sub">수술 전 준비 · 부위 확인 · 소지품 관리</div></div></div>
+          <div class="card-bottom"><span class="card-badge cb-purple">13개 항목 · 전체 필수</span><span class="card-arrow">→</span></div>
+        </a>
+        <a class="checklist-card" href="checklist_수술테마2.html">
+          <div class="card-top"><div class="card-icon ci-purple">🧰</div><div class="card-info"><div class="card-title">수술테마 2</div><div class="card-sub">물품 계수 · Time out · 검체 인계</div></div></div>
+          <div class="card-bottom"><span class="card-badge cb-purple">16개 항목 · 전체 필수</span><span class="card-arrow">→</span></div>
+        </a>
+      </div>
+    </div>
+
+    <div class="section">
+      <div class="section-header">
+        <span class="time-badge badge-etc">📝 기타</span>
+        <span class="section-title">교수자 도구</span>
+        <span class="section-count">1개</span>
+      </div>
+      <div class="card-grid">
+        <a class="checklist-card" href="self_check_교수자.html">
+          <div class="card-top"><div class="card-icon ci-gold">🎓</div><div class="card-info"><div class="card-title">교수자로서의 자기 점검표</div><div class="card-sub">강의 역량 자기 평가 (5점 척도)</div></div></div>
+          <div class="card-bottom"><span class="card-badge cb-gold">20개 문항 · 총점 100점</span><span class="card-arrow">→</span></div>
+        </a>
+      </div>
+    </div>
+  </div>
+
+</div>
+
+<div class="footer">
+  간호부문 공통 신입간호사 스타트(입문)교육 &nbsp;|&nbsp; 샤인센터
+</div>
+
+<script>
+  const d = new Date();
+  document.getElementById('headerDate').textContent =
+    d.getFullYear() + '년 ' + (d.getMonth()+1) + '월 ' + d.getDate() + '일';
+
+  function switchDay(day) {
+    document.getElementById('panel4').classList.remove('active');
+    document.getElementById('panel5').classList.remove('active');
+    document.getElementById('tab4').className = 'day-tab';
+    document.getElementById('tab5').className = 'day-tab';
+    document.getElementById('panel' + day).classList.add('active');
+    document.getElementById('tab' + day).className = 'day-tab active-' + day;
+    window.scrollTo({top: 0, behavior: 'smooth'});
+  }
+</script>
+</body>
+</html>

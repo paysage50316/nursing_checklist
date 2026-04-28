@@ -1,0 +1,1154 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>기본간호1 시뮬레이션 체크리스트</title>
+<link href="https://fonts.googleapis.com/css2?family=Noto+Sans+KR:wght@300;400;500;600;700&family=JetBrains+Mono:wght@400;600&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --bg: #f0f4f8;
+    --surface: #ffffff;
+    --surface2: #f8fafc;
+    --border: #e2e8f0;
+    --border-strong: #cbd5e1;
+    --text-primary: #1e293b;
+    --text-secondary: #64748b;
+    --text-muted: #94a3b8;
+    --accent: #0f766e;
+    --accent-light: #ccfbf1;
+    --accent2: #0e7490;
+    --accent2-light: #cffafe;
+    --accent3: #7c3aed;
+    --accent3-light: #ede9fe;
+    --y-color: #16a34a;
+    --y-bg: #dcfce7;
+    --y-border: #86efac;
+    --n-color: #dc2626;
+    --n-bg: #fee2e2;
+    --n-border: #fca5a5;
+    --d-color: #d97706;
+    --d-bg: #fef3c7;
+    --d-border: #fcd34d;
+    --header-h: #1e3a5f;
+    --radius: 10px;
+    --shadow: 0 1px 3px rgba(0,0,0,0.08), 0 1px 2px rgba(0,0,0,0.04);
+    --shadow-md: 0 4px 6px -1px rgba(0,0,0,0.1), 0 2px 4px -2px rgba(0,0,0,0.06);
+  }
+
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+
+  body {
+    font-family: 'Noto Sans KR', sans-serif;
+    background: var(--bg);
+    color: var(--text-primary);
+    min-height: 100vh;
+    line-height: 1.5;
+  }
+
+  /* ── HEADER ── */
+  .site-header {
+    background: var(--header-h);
+    color: #fff;
+    padding: 20px 32px;
+    display: flex;
+    align-items: center;
+    gap: 16px;
+    box-shadow: 0 2px 8px rgba(0,0,0,0.2);
+  }
+  .site-header .logo {
+    width: 40px; height: 40px;
+    background: rgba(255,255,255,0.15);
+    border-radius: 8px;
+    display: flex; align-items: center; justify-content: center;
+    font-size: 20px;
+  }
+  .site-header h1 { font-size: 18px; font-weight: 700; letter-spacing: -0.3px; }
+  .site-header p { font-size: 12px; opacity: 0.65; margin-top: 2px; }
+  .header-badge {
+    margin-left: auto;
+    background: rgba(255,255,255,0.15);
+    border: 1px solid rgba(255,255,255,0.25);
+    color: #fff;
+    font-size: 11px;
+    padding: 4px 10px;
+    border-radius: 20px;
+    font-weight: 500;
+  }
+
+  /* ── LAYOUT ── */
+  .main-wrap {
+    max-width: 1400px;
+    margin: 0 auto;
+    padding: 28px 24px 60px;
+    display: grid;
+    grid-template-columns: 280px 1fr;
+    gap: 24px;
+    align-items: start;
+  }
+
+  /* ── SIDEBAR ── */
+  .sidebar { position: sticky; top: 24px; display: flex; flex-direction: column; gap: 16px; }
+
+  .card {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: var(--radius);
+    box-shadow: var(--shadow);
+    overflow: hidden;
+  }
+  .card-header {
+    padding: 14px 18px;
+    border-bottom: 1px solid var(--border);
+    background: var(--surface2);
+    display: flex; align-items: center; gap: 8px;
+  }
+  .card-header h2 { font-size: 13px; font-weight: 700; color: var(--text-primary); }
+  .card-header .icon { font-size: 15px; }
+  .card-body { padding: 16px 18px; }
+
+  /* ── PERSON MANAGEMENT ── */
+  .person-list { display: flex; flex-direction: column; gap: 8px; }
+  .person-item {
+    display: flex; align-items: center; gap: 8px;
+    padding: 8px 10px;
+    background: var(--surface2);
+    border: 1px solid var(--border);
+    border-radius: 8px;
+    transition: all 0.15s;
+  }
+  .person-item.active-person {
+    border-color: var(--accent);
+    background: var(--accent-light);
+  }
+  .person-dot {
+    width: 24px; height: 24px;
+    border-radius: 50%;
+    display: flex; align-items: center; justify-content: center;
+    font-size: 11px; font-weight: 700; color: #fff;
+    flex-shrink: 0;
+  }
+  .person-name-input {
+    flex: 1;
+    border: none;
+    background: transparent;
+    font-family: inherit;
+    font-size: 13px;
+    font-weight: 500;
+    color: var(--text-primary);
+    outline: none;
+    min-width: 0;
+  }
+  .person-name-input::placeholder { color: var(--text-muted); font-weight: 400; }
+  .person-stats {
+    display: flex; gap: 4px; flex-shrink: 0;
+  }
+  .stat-pill {
+    font-size: 10px; font-weight: 700;
+    padding: 2px 6px; border-radius: 10px;
+    font-family: 'JetBrains Mono', monospace;
+  }
+  .stat-y { background: var(--y-bg); color: var(--y-color); }
+  .stat-n { background: var(--n-bg); color: var(--n-color); }
+  .stat-d { background: var(--d-bg); color: var(--d-color); }
+
+  .add-person-btn {
+    width: 100%;
+    padding: 9px;
+    border: 1.5px dashed var(--border-strong);
+    border-radius: 8px;
+    background: transparent;
+    color: var(--text-secondary);
+    font-family: inherit;
+    font-size: 13px;
+    cursor: pointer;
+    display: flex; align-items: center; justify-content: center; gap: 6px;
+    transition: all 0.15s;
+  }
+  .add-person-btn:hover { border-color: var(--accent); color: var(--accent); background: var(--accent-light); }
+
+  /* ── NAV TABS ── */
+  .nav-tabs { display: flex; flex-direction: column; gap: 4px; padding: 10px; }
+  .nav-tab {
+    padding: 10px 14px;
+    border-radius: 7px;
+    border: none;
+    background: transparent;
+    font-family: inherit;
+    font-size: 13px;
+    font-weight: 500;
+    color: var(--text-secondary);
+    cursor: pointer;
+    text-align: left;
+    display: flex; align-items: center; gap: 8px;
+    transition: all 0.15s;
+  }
+  .nav-tab:hover { background: var(--surface2); color: var(--text-primary); }
+  .nav-tab.active { background: var(--accent); color: #fff; }
+  .nav-tab .tab-count {
+    margin-left: auto;
+    font-size: 10px;
+    opacity: 0.75;
+    font-family: 'JetBrains Mono', monospace;
+  }
+
+  /* ── LEGEND ── */
+  .legend-grid { display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 8px; }
+  .legend-item {
+    display: flex; flex-direction: column; align-items: center; gap: 4px;
+    padding: 8px 6px;
+    border-radius: 7px;
+    font-size: 11px;
+    font-weight: 500;
+    text-align: center;
+  }
+  .legend-y { background: var(--y-bg); color: var(--y-color); border: 1px solid var(--y-border); }
+  .legend-n { background: var(--n-bg); color: var(--n-color); border: 1px solid var(--n-border); }
+  .legend-d { background: var(--d-bg); color: var(--d-color); border: 1px solid var(--d-border); }
+  .legend-letter { font-size: 18px; font-weight: 800; font-family: 'JetBrains Mono', monospace; }
+
+  /* ── MAIN CONTENT ── */
+  .content-area { display: flex; flex-direction: column; gap: 20px; }
+  .section-card { background: var(--surface); border: 1px solid var(--border); border-radius: var(--radius); box-shadow: var(--shadow); overflow: hidden; }
+  .section-header {
+    padding: 14px 20px;
+    border-bottom: 1px solid var(--border);
+    display: flex; align-items: center; gap: 10px;
+  }
+  .section-badge {
+    padding: 3px 10px;
+    border-radius: 20px;
+    font-size: 11px;
+    font-weight: 700;
+    letter-spacing: 0.5px;
+  }
+  .badge-s1 { background: var(--accent-light); color: var(--accent); }
+  .badge-s2l { background: var(--accent2-light); color: var(--accent2); }
+  .badge-s2u { background: var(--accent3-light); color: var(--accent3); }
+  .section-title { font-size: 14px; font-weight: 700; }
+  .section-count { margin-left: auto; font-size: 12px; color: var(--text-muted); font-family: 'JetBrains Mono', monospace; }
+
+  /* ── TABLE ── */
+  .table-wrapper { overflow-x: auto; }
+  table { width: 100%; border-collapse: collapse; font-size: 13px; }
+  thead tr { background: var(--surface2); }
+  thead th {
+    padding: 10px 12px;
+    text-align: center;
+    font-weight: 600;
+    font-size: 11px;
+    color: var(--text-secondary);
+    border-bottom: 2px solid var(--border-strong);
+    white-space: nowrap;
+  }
+  thead th.col-num { width: 48px; }
+  thead th.col-content { text-align: left; min-width: 260px; }
+  thead th.col-person { min-width: 110px; }
+
+  .person-col-header {
+    display: flex; flex-direction: column; align-items: center; gap: 4px;
+  }
+  .person-col-name {
+    font-size: 12px; font-weight: 700; color: var(--text-primary);
+    max-width: 90px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap;
+  }
+  .person-col-ynd { display: flex; gap: 2px; }
+  .col-label {
+    width: 26px; font-size: 10px; font-weight: 700; text-align: center;
+    padding: 1px 0; border-radius: 4px;
+    font-family: 'JetBrains Mono', monospace;
+  }
+  .col-y { background: var(--y-bg); color: var(--y-color); }
+  .col-n { background: var(--n-bg); color: var(--n-color); }
+  .col-d { background: var(--d-bg); color: var(--d-color); }
+
+  tbody tr { border-bottom: 1px solid var(--border); transition: background 0.1s; }
+  tbody tr:hover { background: #f8fafc; }
+  tbody tr:last-child { border-bottom: none; }
+
+  td { padding: 8px 12px; vertical-align: middle; }
+  td.num-cell {
+    text-align: center;
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 12px;
+    font-weight: 600;
+    color: var(--text-muted);
+    background: var(--surface2);
+  }
+  td.content-cell { color: var(--text-primary); line-height: 1.5; font-size: 13px; }
+  td.check-group { text-align: center; padding: 8px 6px; }
+
+  .ynd-group { display: flex; gap: 4px; justify-content: center; align-items: center; }
+
+  .check-btn {
+    width: 28px; height: 28px;
+    border-radius: 6px;
+    border: 1.5px solid var(--border-strong);
+    background: var(--surface);
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 12px;
+    font-weight: 700;
+    cursor: pointer;
+    color: var(--text-muted);
+    transition: all 0.13s;
+    display: flex; align-items: center; justify-content: center;
+  }
+  .check-btn:hover { border-color: var(--border-strong); background: var(--surface2); color: var(--text-secondary); }
+  .check-btn.active-y { background: var(--y-bg); border-color: var(--y-border); color: var(--y-color); }
+  .check-btn.active-n { background: var(--n-bg); border-color: var(--n-border); color: var(--n-color); }
+  .check-btn.active-d { background: var(--d-bg); border-color: var(--d-border); color: var(--d-color); }
+
+  /* ── TOTALS ROW ── */
+  .totals-row td { background: #f1f5f9; font-weight: 600; font-size: 12px; }
+  .totals-row td.total-label { color: var(--text-secondary); font-size: 12px; }
+  .total-cell { display: flex; gap: 4px; justify-content: center; }
+  .total-num {
+    min-width: 26px; padding: 2px 5px;
+    border-radius: 5px;
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 11px; font-weight: 700;
+    text-align: center;
+  }
+
+  /* ── SUMMARY SECTION ── */
+  .summary-bar {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: var(--radius);
+    padding: 18px 20px;
+    box-shadow: var(--shadow);
+  }
+  .summary-title { font-size: 13px; font-weight: 700; color: var(--text-secondary); margin-bottom: 14px; letter-spacing: 0.3px; text-transform: uppercase; font-size: 11px; }
+  .summary-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(140px, 1fr)); gap: 10px; }
+  .summary-person {
+    padding: 12px 14px;
+    border-radius: 8px;
+    border: 1px solid var(--border);
+    background: var(--surface2);
+  }
+  .summary-person-name { font-size: 13px; font-weight: 700; margin-bottom: 8px; color: var(--text-primary); }
+  .summary-stats { display: flex; flex-direction: column; gap: 5px; }
+  .summary-stat { display: flex; justify-content: space-between; align-items: center; }
+  .summary-stat-label { font-size: 11px; font-weight: 600; }
+  .summary-stat-val { font-size: 13px; font-weight: 800; font-family: 'JetBrains Mono', monospace; }
+  .sy { color: var(--y-color); }
+  .sn { color: var(--n-color); }
+  .sd { color: var(--d-color); }
+
+  /* ── UTIL ── */
+  .section-actions { display: flex; gap: 8px; margin-left: auto; }
+  .reset-btn {
+    padding: 5px 10px;
+    border: 1px solid var(--border-strong);
+    border-radius: 6px;
+    background: var(--surface);
+    font-family: inherit;
+    font-size: 11px;
+    font-weight: 600;
+    color: var(--text-secondary);
+    cursor: pointer;
+    transition: all 0.15s;
+  }
+  .reset-btn:hover { background: #fee2e2; border-color: #fca5a5; color: #dc2626; }
+
+  .del-person-btn {
+    flex-shrink: 0;
+    width: 22px; height: 22px;
+    border-radius: 50%;
+    border: none;
+    background: transparent;
+    color: var(--text-muted);
+    font-size: 11px;
+    cursor: pointer;
+    display: flex; align-items: center; justify-content: center;
+    transition: all 0.15s;
+    line-height: 1;
+  }
+  .del-person-btn:hover { background: var(--n-bg); color: var(--n-color); }
+
+  .submit-btn {
+    width: 100%;
+    padding: 11px;
+    border: none;
+    border-radius: 8px;
+    background: var(--header-h);
+    color: #fff;
+    font-family: inherit;
+    font-size: 13px;
+    font-weight: 700;
+    cursor: pointer;
+    display: flex; align-items: center; justify-content: center; gap: 6px;
+    transition: all 0.15s;
+    margin-top: 10px;
+  }
+  .submit-btn:hover { background: #162d4a; }
+
+  /* ── MODAL ── */
+  .modal-overlay {
+    position: fixed; inset: 0;
+    background: rgba(0,0,0,0.45);
+    display: flex; align-items: center; justify-content: center;
+    z-index: 1000;
+    padding: 24px;
+    backdrop-filter: blur(3px);
+  }
+  .modal-overlay.hidden { display: none; }
+  .modal-box {
+    background: var(--surface);
+    border-radius: 14px;
+    box-shadow: 0 20px 60px rgba(0,0,0,0.25);
+    width: 100%; max-width: 680px;
+    max-height: 85vh;
+    display: flex; flex-direction: column;
+    overflow: hidden;
+  }
+  .modal-header {
+    padding: 20px 24px 16px;
+    border-bottom: 1px solid var(--border);
+    display: flex; align-items: center; gap: 10px;
+  }
+  .modal-header h2 { font-size: 16px; font-weight: 700; flex: 1; }
+  .modal-close {
+    width: 30px; height: 30px; border-radius: 50%;
+    border: none; background: var(--surface2);
+    font-size: 16px; cursor: pointer; color: var(--text-secondary);
+    display: flex; align-items: center; justify-content: center;
+    transition: all 0.15s;
+  }
+  .modal-close:hover { background: var(--n-bg); color: var(--n-color); }
+  .modal-body { padding: 20px 24px; overflow-y: auto; display: flex; flex-direction: column; gap: 14px; }
+
+  .result-person-card {
+    border: 1px solid var(--border);
+    border-radius: 10px;
+    overflow: hidden;
+  }
+  .result-person-header {
+    padding: 12px 16px;
+    display: flex; align-items: center; gap: 10px;
+    background: var(--surface2);
+    border-bottom: 1px solid var(--border);
+  }
+  .result-person-name { font-size: 14px; font-weight: 700; }
+  .result-body { padding: 14px 16px; display: flex; flex-direction: column; gap: 10px; }
+  .result-section-row { display: flex; align-items: center; gap: 8px; flex-wrap: wrap; }
+  .result-section-label { font-size: 12px; color: var(--text-secondary); font-weight: 500; min-width: 160px; }
+  .result-pills { display: flex; gap: 6px; }
+  .result-pill {
+    padding: 3px 10px; border-radius: 20px;
+    font-size: 12px; font-weight: 700;
+    font-family: 'JetBrains Mono', monospace;
+  }
+  .result-divider { border: none; border-top: 1px solid var(--border); margin: 4px 0; }
+  .result-total-row { display: flex; align-items: center; gap: 8px; flex-wrap: wrap; }
+  .result-total-label { font-size: 13px; font-weight: 700; min-width: 160px; }
+  .result-total-pills { display: flex; gap: 8px; }
+  .result-total-pill {
+    padding: 5px 14px; border-radius: 20px;
+    font-size: 14px; font-weight: 800;
+    font-family: 'JetBrains Mono', monospace;
+  }
+  .result-total-pill.ty { background: var(--y-bg); color: var(--y-color); border: 1.5px solid var(--y-border); }
+  .result-total-pill.tn { background: var(--n-bg); color: var(--n-color); border: 1.5px solid var(--n-border); }
+  .result-total-pill.td { background: var(--d-bg); color: var(--d-color); border: 1.5px solid var(--d-border); }
+
+
+  /* ── MEMO ── */
+  .memo-area {
+    width: 100%;
+    margin-top: 8px;
+    padding: 7px 10px;
+    border: 1.5px solid var(--border);
+    border-radius: 7px;
+    background: var(--surface2);
+    font-family: 'Noto Sans KR', sans-serif;
+    font-size: 12px;
+    color: var(--text-primary);
+    resize: vertical;
+    min-height: 52px;
+    line-height: 1.5;
+    transition: border-color 0.15s;
+    box-sizing: border-box;
+  }
+  .memo-area:focus { outline: none; border-color: var(--accent); background: #fff; }
+  .memo-area::placeholder { color: var(--text-muted); }
+  .result-memo {
+    margin-top: 10px;
+    padding: 8px 12px;
+    background: var(--surface2);
+    border-left: 3px solid var(--accent);
+    border-radius: 0 6px 6px 0;
+    font-size: 12px;
+    color: var(--text-secondary);
+    line-height: 1.6;
+    white-space: pre-wrap;
+  }
+  .result-memo-label {
+    font-size: 11px; font-weight: 700; color: var(--accent);
+    margin-bottom: 4px; display: block;
+  }
+  .hidden { display: none !important; }
+
+  @media (max-width: 900px) {
+    .main-wrap { grid-template-columns: 1fr; }
+    .sidebar { position: static; }
+  }
+</style>
+</head>
+<body>
+
+<header class="site-header">
+  <div class="logo">🏥</div>
+  <div>
+    <h1>기본간호1 시뮬레이션 교육 체크리스트</h1>
+    <p>간호부문 공통 신입간호사 스타트(입문)교육</p>
+  </div>
+  <span class="header-badge">Y · N · D</span>
+</header>
+
+<div class="main-wrap">
+  <!-- SIDEBAR -->
+  <aside class="sidebar">
+
+    <div class="card">
+      <div class="card-header"><span class="icon">👤</span><h2>교육생 관리</h2></div>
+      <div class="card-body">
+        <span style="font-size:12px;font-weight:600;color:var(--text-secondary);display:block;margin-bottom:4px">강사명 (최대 5자)</span>
+        <input type="text" id="instructorInput" maxlength="5" placeholder="강사명 입력"
+          style="width:100%;padding:8px 11px;border:1.5px solid var(--border);border-radius:8px;background:var(--surface2);font-family:inherit;font-size:13px;color:var(--text-primary);outline:none;margin-bottom:12px;transition:border-color 0.15s"
+          onfocus="this.style.borderColor='var(--header-h)'" onblur="this.style.borderColor='var(--border)'">
+        <div style="font-size:12px;font-weight:600;color:var(--text-secondary);margin-bottom:4px">교육생 관리</div>
+        <div class="person-list" id="personList"></div>
+        <button class="add-person-btn" id="addPersonBtn" style="margin-top:10px">
+          <span>＋</span> 교육생 추가 (최대 6명)
+        </button>
+        <button class="submit-btn" onclick="openResult()">📋 결과 제출</button>
+      </div>
+    </div>
+
+    <div class="card">
+      <div class="card-header"><span class="icon">📋</span><h2>섹션 이동</h2></div>
+      <div class="nav-tabs">
+        <button class="nav-tab active" data-section="s1" onclick="goToSection('s1',this)">
+          🫁 상황① 흡인 <span class="tab-count">14개</span>
+        </button>
+        <button class="nav-tab" data-section="s2l" onclick="goToSection('s2l',this)">
+          💉 중심정맥관 Locking <span class="tab-count">21개</span>
+        </button>
+        <button class="nav-tab" data-section="s2u" onclick="goToSection('s2u',this)">
+          💉 중심정맥관 Unlocking <span class="tab-count">21개</span>
+        </button>
+        <button class="nav-tab" data-section="memo-section" onclick="goToSection('memo-section',this)">
+          📝 메모
+        </button>
+      </div>
+    </div>
+
+    <div class="card">
+      <div class="card-header"><span class="icon">ℹ️</span><h2>체크 기준</h2></div>
+      <div class="card-body">
+        <div class="legend-grid">
+          <div class="legend-item legend-y"><span class="legend-letter">Y</span>수행함</div>
+          <div class="legend-item legend-n"><span class="legend-letter">N</span>미수행</div>
+          <div class="legend-item legend-d"><span class="legend-letter">D</span>디브리핑</div>
+        </div>
+        <p style="font-size:11px;color:var(--text-muted);margin-top:10px;line-height:1.6">
+          • 기회가 주어진 항목에만 체크<br>
+          • D: 수행 여부와 관계없이 디브리핑 시 체크<br>
+          • 버튼 재클릭 시 선택 해제
+        </p>
+      </div>
+    </div>
+
+  </aside>
+
+  <!-- MAIN -->
+  <main class="content-area">
+
+    <!-- 요약 -->
+    <div class="summary-bar">
+      <div class="summary-title">📊 교육생별 집계 현황</div>
+      <div class="summary-grid" id="summaryGrid">
+        <div style="color:var(--text-muted);font-size:13px;padding:8px 0">교육생을 추가하면 집계가 표시됩니다.</div>
+      </div>
+    </div>
+
+    <!-- 상황① 흡인 -->
+    <div class="section-card" id="s1">
+      <div class="section-header">
+        <span class="section-badge badge-s1">상황①</span>
+        <span class="section-title">흡인 (Suction)</span>
+        <div class="section-actions">
+          <button class="reset-btn" onclick="resetSection('s1')">이 섹션 초기화</button>
+        </div>
+        <span class="section-count" id="count-s1"></span>
+      </div>
+      <div class="table-wrapper">
+        <table id="table-s1">
+          <thead id="thead-s1"></thead>
+          <tbody id="tbody-s1"></tbody>
+        </table>
+      </div>
+    </div>
+
+    <!-- 상황② Locking -->
+    <div class="section-card" id="s2l">
+      <div class="section-header">
+        <span class="section-badge badge-s2l">상황②-1</span>
+        <span class="section-title">중심정맥관 Locking</span>
+        <div class="section-actions">
+          <button class="reset-btn" onclick="resetSection('s2l')">이 섹션 초기화</button>
+        </div>
+        <span class="section-count" id="count-s2l"></span>
+      </div>
+      <div class="table-wrapper">
+        <table id="table-s2l">
+          <thead id="thead-s2l"></thead>
+          <tbody id="tbody-s2l"></tbody>
+        </table>
+      </div>
+    </div>
+
+    <!-- 상황② Unlocking -->
+    <div class="section-card" id="s2u">
+      <div class="section-header">
+        <span class="section-badge badge-s2u">상황②-2</span>
+        <span class="section-title">중심정맥관 Unlocking</span>
+        <div class="section-actions">
+          <button class="reset-btn" onclick="resetSection('s2u')">이 섹션 초기화</button>
+        </div>
+        <span class="section-count" id="count-s2u"></span>
+      </div>
+      <div class="table-wrapper">
+        <table id="table-s2u">
+          <thead id="thead-s2u"></thead>
+          <tbody id="tbody-s2u"></tbody>
+        </table>
+      </div>
+    </div>
+
+    <!-- 메모 섹션 -->
+    <div class="section-card" id="memo-section">
+      <div class="section-header">
+        <span class="section-badge" style="background:#f0f9ff;color:#0369a1">📝</span>
+        <span class="section-title">교육생별 메모</span>
+      </div>
+      <div id="memoCards" style="padding:16px 20px;display:flex;flex-direction:column;gap:12px">
+        <p style="color:var(--text-muted);font-size:13px">교육생을 추가하면 메모란이 표시됩니다.</p>
+      </div>
+    </div>
+
+  </main>
+</div>
+
+<script>
+// ─────────────────────────────────────────────
+// DATA
+// ─────────────────────────────────────────────
+const PERSON_COLORS = ['#0f766e','#0e7490','#7c3aed','#b45309','#be185d','#16a34a'];
+
+const SECTIONS = {
+  s1: {
+    items: [
+      {num:1,  text:'첫만남 자기소개를 한다.'},
+      {num:2,  text:'손위생을 수행한다.'},
+      {num:3,  text:'개방형 질문으로 환자 확인(이름, 등록번호)을 한다.'},
+      {num:4,  text:'환자에게 흡인에 대한 목적과 절차를 설명한다.'},
+      {num:5,  text:'기관절개관 흡인을 위한 카테터를 선택한다(Nelatone/latex 카테터 선택).'},
+      {num:6,  text:'대상자에 따라 흡인압을 설정한다(성인 및 소아 80-120mmHg, 신생아 60-80mmHg).'},
+      {num:7,  text:'손위생 후 일회용 멸균장갑을 착용한다.'},
+      {num:8,  text:'무균적으로 카테터와 흡인관을 연결한다.'},
+      {num:9,  text:'카테터 끝을 멸균 생리식염수를 통과시킨다.'},
+      {num:10, text:'흡인 조절구멍을 열어 놓은 상태에서 흡인 경로에 따라 적절한 깊이로 카테터를 삽입한다.'},
+      {num:11, text:'흡인 조절구멍을 엄지손가락으로 막고 부드럽게 카테터를 돌리면서 천천히 빼낸다.'},
+      {num:12, text:'1회 흡인은 10초 이내 흡인 시행, 반복하는 경우 적어도 20~30초의 간격을 두어야 한다.'},
+      {num:13, text:'카테터 끝을 멸균 생리식염수를 통과시킨다.'},
+      {num:14, text:'환자를 관찰하고 분비물의 양, 색깔, 양상 등을 관찰한다.'},
+    ]
+  },
+  s2l: {
+    items: [
+      {num:15, text:'손위생 후 중심정맥관 개방성 확인을 위한 물품을 준비한다. [트레이, 드레싱 세트, 세트 안-10cc 주사기, 소독액, 잠금형 캡(lure-lock cap), 세트 밖-Posi flush, 헤파린 희석액이 들어있는 10cc 주사기, 멸균 장갑]'},
+      {num:16, text:'첫만남 자기소개를 한다.'},
+      {num:17, text:'손위생을 수행한다.'},
+      {num:18, text:'개방형 질문으로 환자 확인(이름, 등록번호)을 한다.'},
+      {num:19, text:'환자에게 약물 중단에 대한 목적과 절차를 설명한다.'},
+      {num:20, text:'주입중인 생리식염수를 잠그고 준비 물품이 담긴 트레이를 침상에 놓는다.'},
+      {num:21, text:'중심정맥관을 관찰하고 삽입부위에 압통, 발적 등이 없는지 확인한다.'},
+      {num:22, text:'손위생 후 멸균장갑을 착용한다.'},
+      {num:23, text:'카테터의 잠금고리가 잠겨 있는지 확인하고 수액세트를 분리한다.'},
+      {num:24, text:'주입구를 적절한 소독제로(10% 포비돈 아이오다인 또는 2% 클로르헥시딘, 일회용 70% 알코올솜) 5회 이상 소독한 후 빈 주사기를 연결한다.'},
+      {num:25, text:'잠금고리를 열고 주사기 내관을 뒤로 당겨 혈액이 역류 되는지 확인하면서 혈액 3cc를 뽑는다.'},
+      {num:26, text:'카테터의 잠금고리를 잠근 후 주사기를 분리한다.'},
+      {num:27, text:'주입구를 소독한 후 관류용 생리식염수를 연결하여 주입한다.'},
+      {num:28, text:'카테터의 잠금고리를 잠근 후 주사기를 분리한다.'},
+      {num:29, text:'주입구를 소독한 후 100unit/cc 헤파린 희석액 혹은 생리식염수가 들어있는 주사기를 연결한 후 희석액이 남았을 때 미는 힘을 유지한 채로 잠금고리를 잠근 후 주사기를 분리한다.'},
+      {num:30, text:'주입구를 소독한 후 잠금형 캡(Luer lock)을 연결한다.'},
+      {num:31, text:'물품을 정리한 후 손위생을 시행한다.'},
+      {num:32, text:'상황 종료 후 환자에게 주의 사항을 설명한 후 마무리 한다.'},
+    ]
+  },
+  s2u: {
+    items: [
+      {num:15, text:'손위생 후 중심정맥관 개방성 확인을 위한 물품을 준비한다. [트레이, 드레싱 세트, 세트 안-10cc 주사기, 소독액, 세트 밖-Posi flush, 멸균 장갑, NS수액, 수액주입조절기]'},
+      {num:16, text:'첫만남 자기소개를 한다.'},
+      {num:17, text:'손위생을 수행한다.'},
+      {num:18, text:'개방형 질문으로 환자 확인(이름, 등록번호)을 한다.'},
+      {num:19, text:'환자에게 약물 주입에 대해 목적과 절차를 설명한다.'},
+      {num:20, text:'수액걸이에 NS 수액을 걸고 준비 물품이 담긴 트레이를 침상에 놓는다.'},
+      {num:21, text:'중심정맥관을 관찰하고 삽입부위에 압통, 발적 등이 없는지 확인한다.'},
+      {num:22, text:'손위생 후 멸균장갑을 착용한다.'},
+      {num:23, text:'카테터의 잠금고리가 잠겨 있는지 확인하고 잠금형 캡(luer-lock cap)을 분리한다.'},
+      {num:24, text:'주입구를 적절한 소독제로(10% 포비돈 아이오다인 또는 2% 클로르헥시딘, 일회용 70% 알코올솜) 5회 이상 소독한 후 빈 주사기를 연결한다.'},
+      {num:25, text:'잠금고리를 열고 주사기 내관을 뒤로 당겨 혈액이 역류 되는지 확인하면서 혈액 3cc를 뽑는다.'},
+      {num:26, text:'카테터의 잠금고리를 잠근 후 주사기를 분리한다.'},
+      {num:27, text:'주입구를 소독한 후 관류용 생리식염수를 연결하여 주입한다.'},
+      {num:28, text:'카테터의 잠금고리를 잠근 후 주사기를 분리한다.'},
+      {num:29, text:'주입구를 소독한 후 수액세트를 연결한다.'},
+      {num:30, text:'수액세트의 조절기를 열어 의사 오더에 따라 주입속도를 조절한다.'},
+      {num:31, text:'물품을 정리한 후 손위생을 시행한다.'},
+      {num:32, text:'상황 종료 후 환자에게 주의 사항을 설명한 후 마무리 한다.'},
+    ]
+  }
+};
+
+// ─────────────────────────────────────────────
+// STATE
+// ─────────────────────────────────────────────
+let persons = []; // {id, name, memo}
+// checks[sectionKey][personId][itemNum] = {Y:bool, N:bool, D:bool}
+// Y와 N은 상호 배타, D는 Y 또는 N과 동시 체크 가능
+let checks = { s1:{}, s2l:{}, s2u:{} };
+
+function getCell(sk, pid, num) {
+  if (!checks[sk][pid]) checks[sk][pid] = {};
+  if (!checks[sk][pid][num]) checks[sk][pid][num] = {Y:false, N:false, D:false};
+  return checks[sk][pid][num];
+}
+
+function countVal(c, v) {
+  return Object.values(c).filter(cell => cell && cell[v]).length;
+}
+
+function nextId() { return Date.now() + Math.random(); }
+
+// ─────────────────────────────────────────────
+// PERSON MANAGEMENT
+// ─────────────────────────────────────────────
+function addPerson() {
+  if (persons.length >= 6) return;
+  const p = { id: nextId(), name: '' };
+  persons.push(p);
+  ['s1','s2l','s2u'].forEach(s => { checks[s][p.id] = {}; });
+  renderAll();
+}
+
+function removePerson(id) {
+  persons = persons.filter(p => p.id !== id);
+  ['s1','s2l','s2u'].forEach(s => { delete checks[s][id]; });
+  renderAll();
+}
+
+function updateName(id, val) {
+  const p = persons.find(x => x.id === id);
+  if (p) p.name = val;
+  renderHeaders();
+  renderSummary();
+  renderPersonList();
+}
+
+// ─────────────────────────────────────────────
+// CHECK TOGGLE
+// ─────────────────────────────────────────────
+function toggle(sectionKey, personId, itemNum, val) {
+  const cell = getCell(sectionKey, personId, itemNum);
+  if (val === 'Y') {
+    cell.Y = !cell.Y;
+    if (cell.Y) cell.N = false; // Y↔N 상호 배타
+  } else if (val === 'N') {
+    cell.N = !cell.N;
+    if (cell.N) cell.Y = false; // Y↔N 상호 배타
+  } else if (val === 'D') {
+    cell.D = !cell.D; // D는 독립 토글
+  }
+  updateCell(sectionKey, personId, itemNum);
+  updateTotals(sectionKey);
+  renderSummary();
+  updatePersonStats();
+}
+
+function updateCell(sk, pid, num) {
+  const cell = getCell(sk, pid, num);
+  ['Y','N','D'].forEach(v => {
+    const btn = document.getElementById(`btn-${sk}-${pid}-${num}-${v}`);
+    if (!btn) return;
+    btn.className = 'check-btn' + (cell[v] ? ` active-${v.toLowerCase()}` : '');
+  });
+}
+
+// ─────────────────────────────────────────────
+// RENDER TABLES
+// ─────────────────────────────────────────────
+function renderTable(sk) {
+  const items = SECTIONS[sk].items;
+  const thead = document.getElementById(`thead-${sk}`);
+  const tbody = document.getElementById(`tbody-${sk}`);
+
+  // Header
+  let htr = '<tr><th class="col-num">연번</th><th class="col-content">내용</th>';
+  persons.forEach((p, i) => {
+    const name = p.name || `교육생 ${i+1}`;
+    htr += `<th class="col-person">
+      <div class="person-col-header">
+        <div class="person-col-name" title="${name}">${name}</div>
+        <div class="person-col-ynd">
+          <span class="col-label col-y">Y</span>
+          <span class="col-label col-n">N</span>
+          <span class="col-label col-d">D</span>
+        </div>
+      </div>
+    </th>`;
+  });
+  htr += '</tr>';
+  thead.innerHTML = htr;
+
+  // Body
+  let rows = '';
+  items.forEach(item => {
+    rows += `<tr>
+      <td class="num-cell">${item.num}</td>
+      <td class="content-cell">${item.text}</td>`;
+    persons.forEach(p => {
+      const cell = getCell(sk, p.id, item.num);
+      rows += `<td class="check-group">
+        <div class="ynd-group">
+          <button id="btn-${sk}-${p.id}-${item.num}-Y" class="check-btn${cell.Y?' active-y':''}" onclick="toggle('${sk}',${p.id},${item.num},'Y')">Y</button>
+          <button id="btn-${sk}-${p.id}-${item.num}-N" class="check-btn${cell.N?' active-n':''}" onclick="toggle('${sk}',${p.id},${item.num},'N')">N</button>
+          <button id="btn-${sk}-${p.id}-${item.num}-D" class="check-btn${cell.D?' active-d':''}" onclick="toggle('${sk}',${p.id},${item.num},'D')">D</button>
+        </div>
+      </td>`;
+    });
+    rows += '</tr>';
+  });
+
+  // Totals row
+  rows += `<tr class="totals-row">
+    <td class="num-cell">—</td>
+    <td class="content-cell total-label">소계 (총 ${items.length}개)</td>`;
+  persons.forEach(p => {
+    const c = checks[sk][p.id] || {};
+    const y = countVal(c, 'Y');
+    const n = countVal(c, 'N');
+    const d = countVal(c, 'D');
+    rows += `<td class="check-group" id="total-${sk}-${p.id}">
+      <div class="total-cell">
+        <span class="total-num stat-y">${y}</span>
+        <span class="total-num stat-n">${n}</span>
+        <span class="total-num stat-d">${d}</span>
+      </div>
+    </td>`;
+  });
+  rows += '</tr>';
+
+  tbody.innerHTML = rows;
+  document.getElementById(`count-s${sk.slice(1)}`);
+}
+
+function updateTotals(sk) {
+  persons.forEach(p => {
+    const c = checks[sk][p.id] || {};
+    const y = countVal(c, 'Y');
+    const n = countVal(c, 'N');
+    const d = countVal(c, 'D');
+    const el = document.getElementById(`total-${sk}-${p.id}`);
+    if (el) el.innerHTML = `<div class="total-cell">
+      <span class="total-num stat-y">${y}</span>
+      <span class="total-num stat-n">${n}</span>
+      <span class="total-num stat-d">${d}</span>
+    </div>`;
+  });
+}
+
+function renderHeaders() {
+  ['s1','s2l','s2u'].forEach(sk => {
+    const thead = document.getElementById(`thead-${sk}`);
+    if (!thead) return;
+    let htr = '<tr><th class="col-num">연번</th><th class="col-content">내용</th>';
+    persons.forEach((p, i) => {
+      const name = p.name || `교육생 ${i+1}`;
+      htr += `<th class="col-person">
+        <div class="person-col-header">
+          <div class="person-col-name" title="${name}">${name}</div>
+          <div class="person-col-ynd">
+            <span class="col-label col-y">Y</span>
+            <span class="col-label col-n">N</span>
+            <span class="col-label col-d">D</span>
+          </div>
+        </div>
+      </th>`;
+    });
+    htr += '</tr>';
+    thead.innerHTML = htr;
+  });
+}
+
+// ─────────────────────────────────────────────
+// PERSON LIST SIDEBAR
+// ─────────────────────────────────────────────
+function renderPersonList() {
+  const el = document.getElementById('personList');
+  let html = '';
+  persons.forEach((p, i) => {
+    let y=0,n=0,d=0;
+    ['s1','s2l','s2u'].forEach(sk => {
+      const c = checks[sk][p.id] || {};
+      y += countVal(c, 'Y');
+      n += countVal(c, 'N');
+      d += countVal(c, 'D');
+    });
+    html += `<div class="person-item" >
+      <div class="person-dot" style="background:${PERSON_COLORS[i]}">${i+1}</div>
+      <input class="person-name-input" type="text" value="${p.name}" placeholder="이름 (5자 이내)"
+        maxlength="5" data-pid="${p.id}" />
+      <div class="person-stats">
+        <span class="stat-pill stat-y">Y${y}</span>
+        <span class="stat-pill stat-n">N${n}</span>
+        <span class="stat-pill stat-d">D${d}</span>
+      </div>
+      <button class="del-person-btn" data-pid="${p.id}" title="삭제">✕</button>
+    </div>`;
+  });
+  el.innerHTML = html;
+
+  const addBtn = document.getElementById('addPersonBtn');
+  addBtn.style.display = persons.length >= 6 ? 'none' : 'flex';
+}
+
+// ─────────────────────────────────────────────
+// SUMMARY
+// ─────────────────────────────────────────────
+function renderSummary() {
+  const el = document.getElementById('summaryGrid');
+  if (persons.length === 0) {
+    el.innerHTML = '<div style="color:var(--text-muted);font-size:13px;padding:8px 0">교육생을 추가하면 집계가 표시됩니다.</div>';
+    return;
+  }
+  let html = '';
+  persons.forEach((p, i) => {
+    const name = p.name || `교육생 ${i+1}`;
+    let totals = {s1:{Y:0,N:0,D:0}, s2l:{Y:0,N:0,D:0}, s2u:{Y:0,N:0,D:0}};
+    ['s1','s2l','s2u'].forEach(sk => {
+      const c = checks[sk][p.id] || {};
+      totals[sk].Y = countVal(c, 'Y');
+      totals[sk].N = countVal(c, 'N');
+      totals[sk].D = countVal(c, 'D');
+    });
+    const totalY = totals.s1.Y + totals.s2l.Y + totals.s2u.Y;
+    const totalN = totals.s1.N + totals.s2l.N + totals.s2u.N;
+    const totalD = totals.s1.D + totals.s2l.D + totals.s2u.D;
+    html += `<div class="summary-person">
+      <div class="summary-person-name">
+        <span style="display:inline-block;width:16px;height:16px;border-radius:50%;background:${PERSON_COLORS[i]};vertical-align:middle;margin-right:6px"></span>
+        ${name}
+      </div>
+      <div class="summary-stats">
+        <div class="summary-stat"><span class="summary-stat-label sy">Y 수행</span><span class="summary-stat-val sy">${totalY}</span></div>
+        <div class="summary-stat"><span class="summary-stat-label sn">N 미수행</span><span class="summary-stat-val sn">${totalN}</span></div>
+        <div class="summary-stat"><span class="summary-stat-label sd">D 디브리핑</span><span class="summary-stat-val sd">${totalD}</span></div>
+      </div>
+    </div>`;
+  });
+  el.innerHTML = html;
+}
+
+// ─────────────────────────────────────────────
+// RESET
+// ─────────────────────────────────────────────
+function resetSection(sk) {
+  if (!confirm('이 섹션의 모든 체크를 초기화하시겠습니까?')) return;
+  persons.forEach(p => { checks[sk][p.id] = {}; });
+  renderTable(sk);
+  renderSummary();
+  renderPersonList();
+}
+
+// ─────────────────────────────────────────────
+// NAV SCROLL
+// ─────────────────────────────────────────────
+function goToSection(id, btn) {
+  document.getElementById(id).scrollIntoView({ behavior:'smooth', block:'start' });
+  document.querySelectorAll('.nav-tab').forEach(t => t.classList.remove('active'));
+  btn.classList.add('active');
+}
+
+// ─────────────────────────────────────────────
+// RENDER ALL
+// ─────────────────────────────────────────────
+function renderAll() {
+  renderPersonList();
+  ['s1','s2l','s2u'].forEach(sk => renderTable(sk));
+  renderSummary();
+  renderMemoCards();
+}
+
+function renderMemoCards() {
+  const el = document.getElementById('memoCards');
+  if (!el) return;
+  if (persons.length === 0) {
+    el.innerHTML = '<p style="color:var(--text-muted);font-size:13px">교육생을 추가하면 메모란이 표시됩니다.</p>';
+    return;
+  }
+  let html = '';
+  persons.forEach((p, i) => {
+    const name = p.name || `교육생 ${i+1}`;
+    html += `<div style="display:flex;flex-direction:column;gap:6px">
+      <label style="font-size:13px;font-weight:700;display:flex;align-items:center;gap:6px">
+        <span style="display:inline-flex;width:22px;height:22px;border-radius:50%;background:${PERSON_COLORS[i]};color:#fff;font-size:11px;font-weight:700;align-items:center;justify-content:center">${i+1}</span>
+        ${name}
+      </label>
+      <textarea class="memo-area" data-memo-pid="${p.id}" placeholder="메모를 입력하세요...">${p.memo || ''}</textarea>
+    </div>`;
+  });
+  el.innerHTML = html;
+}
+
+// ─────────────────────────────────────────────
+// INIT
+// ─────────────────────────────────────────────
+document.getElementById('addPersonBtn').onclick = addPerson;
+
+// 이벤트 위임: 이름 입력 및 삭제 버튼
+document.getElementById('personList').addEventListener('input', e => {
+  const input = e.target.closest('.person-name-input');
+  if (input) {
+    const pid = Number(input.dataset.pid);
+    const p = persons.find(x => x.id === pid);
+    if (p) p.name = input.value;
+    renderHeaders();
+    renderSummary();
+    updatePersonStats();
+    renderMemoCards();
+    return;
+  }
+  const memo = e.target.closest('.memo-area');
+  if (memo) {
+    const pid = Number(memo.dataset.memoPid);
+    const p = persons.find(x => x.id === pid);
+    if (p) p.memo = memo.value;
+  }
+});
+
+document.getElementById('memoCards').addEventListener('input', e => {
+  const memo = e.target.closest('.memo-area');
+  if (!memo) return;
+  const pid = Number(memo.dataset.memoPid);
+  const p = persons.find(x => x.id === pid);
+  if (p) p.memo = memo.value;
+});
+
+document.getElementById('personList').addEventListener('click', e => {
+  const btn = e.target.closest('.del-person-btn');
+  if (!btn) return;
+  const pid = Number(btn.dataset.pid);
+  removePerson(pid);
+});
+
+function updatePersonStats() {
+  persons.forEach(p => {
+    const item = document.querySelector(`.person-name-input[data-pid="${p.id}"]`);
+    if (!item) return;
+    const row = item.closest('.person-item');
+    if (!row) return;
+    let y=0,n=0,d=0;
+    ['s1','s2l','s2u'].forEach(sk => {
+      const c = checks[sk][p.id] || {};
+      y += countVal(c, 'Y');
+      n += countVal(c, 'N');
+      d += countVal(c, 'D');
+    });
+    const pills = row.querySelectorAll('.stat-pill');
+    if (pills[0]) pills[0].textContent = `Y${y}`;
+    if (pills[1]) pills[1].textContent = `N${n}`;
+    if (pills[2]) pills[2].textContent = `D${d}`;
+  });
+}
+
+// ─────────────────────────────────────────────
+// RESULT MODAL
+// ─────────────────────────────────────────────
+const SECTION_LABELS = {
+  s1:  '상황① 흡인',
+  s2l: '상황②-1 중심정맥관 Locking',
+  s2u: '상황②-2 중심정맥관 Unlocking',
+};
+
+function openResult() {
+  if (persons.length === 0) {
+    alert('교육생이 없습니다. 교육생을 추가해 주세요.');
+    return;
+  }
+  const today = new Date();
+  const dateStr = `${today.getFullYear()}-${String(today.getMonth()+1).padStart(2,'0')}-${String(today.getDate()).padStart(2,'0')}`;
+  document.getElementById('resultDate').textContent = dateStr;
+  const instructor = document.getElementById('instructorInput') ? document.getElementById('instructorInput').value.trim() : '';
+  const body = document.getElementById('resultBody');
+  let html = '';
+  persons.forEach((p, i) => {
+    const name = p.name || `교육생 ${i+1}`;
+    let grandY=0, grandN=0, grandD=0;
+    ['s1','s2l','s2u'].forEach(sk => {
+      const c = checks[sk][p.id] || {};
+      grandY += countVal(c,'Y');
+      grandN += countVal(c,'N');
+      grandD += countVal(c,'D');
+    });
+    const memoHtml = p.memo ? `<div class="result-memo"><span class="result-memo-label">📝 메모</span>${p.memo.replace(/</g,'&lt;').replace(/>/g,'&gt;')}</div>` : '';
+    html += `<div class="result-person-card">
+      <div class="result-person-header">
+        <div class="person-dot" style="background:${PERSON_COLORS[i]}">${i+1}</div>
+        <span class="result-person-name">${name}</span>
+      </div>
+      <div class="result-body">
+        <div class="result-total-row">
+          <div class="result-total-pills">
+            <span class="result-total-pill ty">Y ${grandY}</span>
+            <span class="result-total-pill tn">N ${grandN}</span>
+            <span class="result-total-pill td">D ${grandD}</span>
+          </div>
+        </div>
+        ${memoHtml}
+      </div>
+    </div>`;
+  });
+  if (instructor) html = '<div style="font-size:13px;color:var(--text-secondary);background:var(--surface2);padding:10px 14px;border-radius:8px;border-left:3px solid var(--header-h);margin-bottom:0"><strong>🎓 강사</strong>&nbsp;&nbsp;'+instructor.replace(/</g,'&lt;')+'</div>' + html;
+  body.innerHTML = html;
+  document.getElementById('resultModal').classList.remove('hidden');
+}
+
+function closeResult() {
+  document.getElementById('resultModal').classList.add('hidden');
+}
+
+function closeResultOnOverlay(e) {
+  if (e.target === document.getElementById('resultModal')) closeResult();
+}
+
+// Start with 2 default persons
+addPerson();
+addPerson();
+</script>
+
+<!-- RESULT MODAL -->
+<div class="modal-overlay hidden" id="resultModal" onclick="closeResultOnOverlay(event)">
+  <div class="modal-box">
+    <div class="modal-header">
+      <span style="font-size:20px">📋</span>
+      <h2>기본간호1 체크리스트 결과&nbsp;<span id="resultDate" style="font-size:13px;font-weight:500;color:var(--text-secondary)"></span></h2>
+      <button class="modal-close" onclick="closeResult()">✕</button>
+    </div>
+    <div class="modal-body" id="resultBody"></div>
+  </div>
+</div>
+
+</body>
+</html>

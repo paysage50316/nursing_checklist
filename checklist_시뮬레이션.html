@@ -1,0 +1,582 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>응급간호 종합시뮬레이션 체크리스트</title>
+<link href="https://fonts.googleapis.com/css2?family=Noto+Sans+KR:wght@300;400;500;600;700&family=JetBrains+Mono:wght@400;600&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --bg:#f0f4f8; --surface:#fff; --surface2:#f8fafc;
+    --border:#e2e8f0; --border-strong:#cbd5e1;
+    --text-primary:#1e293b; --text-secondary:#64748b; --text-muted:#94a3b8;
+    --accent:#1e3a5f; --accent-light:#e8f0fb;
+    --y-color:#16a34a; --y-bg:#dcfce7; --y-border:#86efac;
+    --n-color:#dc2626; --n-bg:#fee2e2; --n-border:#fca5a5;
+    --d-color:#d97706; --d-bg:#fef3c7; --d-border:#fcd34d;
+    --t1-color:#0e7490; --t1-bg:#e0f7fa; --t1-border:#67e8f9;
+    --t2-color:#7c3aed; --t2-bg:#f3e8ff; --t2-border:#c4b5fd;
+    --radius:10px; --shadow:0 1px 3px rgba(0,0,0,0.08);
+  }
+  *{box-sizing:border-box;margin:0;padding:0;}
+  body{font-family:'Noto Sans KR',sans-serif;background:var(--bg);color:var(--text-primary);min-height:100vh;line-height:1.5;}
+
+  .site-header{background:var(--accent);color:#fff;padding:20px 32px;display:flex;align-items:center;gap:16px;box-shadow:0 2px 8px rgba(0,0,0,0.2);}
+  .site-header .logo{width:40px;height:40px;background:rgba(255,255,255,0.15);border-radius:8px;display:flex;align-items:center;justify-content:center;font-size:20px;}
+  .site-header h1{font-size:17px;font-weight:700;}
+  .site-header p{font-size:12px;opacity:0.65;margin-top:2px;}
+  .header-badge{margin-left:auto;background:rgba(255,255,255,0.15);border:1px solid rgba(255,255,255,0.25);color:#fff;font-size:11px;padding:4px 10px;border-radius:20px;font-weight:500;}
+
+  .main-wrap{max-width:1200px;margin:0 auto;padding:28px 24px 60px;display:grid;grid-template-columns:230px 1fr;gap:24px;align-items:start;}
+  .sidebar{position:sticky;top:24px;display:flex;flex-direction:column;gap:16px;}
+  .card{background:var(--surface);border:1px solid var(--border);border-radius:var(--radius);box-shadow:var(--shadow);overflow:hidden;}
+  .card-header{padding:13px 16px;border-bottom:1px solid var(--border);background:var(--surface2);font-size:13px;font-weight:700;display:flex;align-items:center;gap:6px;}
+  .card-body{padding:14px 16px;}
+
+  .field-label{font-size:11px;font-weight:600;color:var(--text-muted);margin-bottom:5px;display:block;}
+  .text-input{width:100%;padding:8px 11px;border:1.5px solid var(--border);border-radius:8px;background:var(--surface2);font-family:inherit;font-size:13px;color:var(--text-primary);outline:none;transition:border-color 0.15s;}
+  .text-input:focus{border-color:var(--accent);background:#fff;}
+  .text-input::placeholder{color:var(--text-muted);}
+  .textarea-input{width:100%;padding:8px 11px;border:1.5px solid var(--border);border-radius:8px;background:var(--surface2);font-family:inherit;font-size:13px;color:var(--text-primary);outline:none;resize:none;min-height:60px;line-height:1.5;transition:border-color 0.15s;}
+  .textarea-input:focus{border-color:var(--accent);background:#fff;}
+  .textarea-input::placeholder{color:var(--text-muted);}
+  .char-count{font-size:11px;color:var(--text-muted);text-align:right;margin-top:3px;}
+  .char-count.warn{color:var(--n-color);}
+
+  .nav-tabs{display:flex;flex-direction:column;gap:3px;padding:8px;}
+  .nav-tab{padding:8px 12px;border-radius:7px;border:none;background:transparent;font-family:inherit;font-size:12px;font-weight:500;color:var(--text-secondary);cursor:pointer;text-align:left;transition:all 0.15s;}
+  .nav-tab:hover{background:var(--surface2);color:var(--text-primary);}
+  .nav-tab.active{background:var(--accent);color:#fff;}
+
+  .legend-grid{display:grid;grid-template-columns:1fr 1fr 1fr;gap:6px;}
+  .legend-item{display:flex;flex-direction:column;align-items:center;gap:3px;padding:7px 4px;border-radius:7px;font-size:10px;font-weight:600;text-align:center;}
+  .legend-y{background:var(--y-bg);color:var(--y-color);border:1px solid var(--y-border);}
+  .legend-n{background:var(--n-bg);color:var(--n-color);border:1px solid var(--n-border);}
+  .legend-d{background:var(--d-bg);color:var(--d-color);border:1px solid var(--d-border);}
+  .legend-letter{font-size:14px;font-weight:800;font-family:'JetBrains Mono',monospace;}
+
+  .submit-btn{width:100%;padding:11px;border:none;border-radius:8px;background:var(--accent);color:#fff;font-family:inherit;font-size:13px;font-weight:700;cursor:pointer;display:flex;align-items:center;justify-content:center;gap:6px;transition:background 0.15s;margin-top:10px;}
+  .submit-btn:hover{background:#162d4a;}
+
+  .content-area{display:flex;flex-direction:column;gap:20px;}
+
+  .summary-bar{background:var(--surface);border:1px solid var(--border);border-radius:var(--radius);padding:13px 18px;box-shadow:var(--shadow);display:flex;align-items:center;gap:12px;flex-wrap:wrap;}
+  .summary-pills{display:flex;gap:6px;}
+  .sp{padding:3px 12px;border-radius:20px;font-size:12px;font-weight:800;font-family:'JetBrains Mono',monospace;}
+  .sp-y{background:var(--y-bg);color:var(--y-color);border:1px solid var(--y-border);}
+  .sp-n{background:var(--n-bg);color:var(--n-color);border:1px solid var(--n-border);}
+  .sp-d{background:var(--d-bg);color:var(--d-color);border:1px solid var(--d-border);}
+  .summary-label{font-size:11px;font-weight:700;color:var(--text-muted);margin-right:2px;}
+
+  .checklist-card{background:var(--surface);border:1px solid var(--border);border-radius:var(--radius);box-shadow:var(--shadow);overflow:hidden;}
+  .checklist-header{padding:13px 20px;border-bottom:1px solid var(--border);display:flex;align-items:center;gap:10px;}
+  .checklist-title{font-size:14px;font-weight:700;}
+  .reset-all-btn{margin-left:auto;padding:5px 10px;border:1px solid var(--border-strong);border-radius:6px;background:var(--surface);font-family:inherit;font-size:11px;font-weight:600;color:var(--text-secondary);cursor:pointer;transition:all 0.15s;}
+  .reset-all-btn:hover{background:#fee2e2;border-color:#fca5a5;color:#dc2626;}
+
+  .table-wrapper{overflow-x:auto;}
+  table{width:100%;border-collapse:collapse;font-size:13px;}
+  thead th{padding:9px 12px;background:var(--surface2);font-weight:700;font-size:11px;color:var(--text-secondary);border-bottom:2px solid var(--border-strong);text-align:center;white-space:nowrap;}
+  thead th.col-num{width:44px;}
+  thead th.col-content{text-align:left;min-width:200px;}
+  thead th.col-single{width:110px;}
+  thead th.col-t1{width:130px;background:var(--t1-bg);color:var(--t1-color);}
+  thead th.col-t2{width:130px;background:var(--t2-bg);color:var(--t2-color);}
+
+  tr.sec-header td{background:#f1f5f9;padding:6px 14px;border-top:2px solid var(--border-strong);border-bottom:1px solid var(--border);}
+  .sec-badge{display:inline-block;padding:2px 10px;border-radius:10px;font-size:11px;font-weight:700;}
+
+  tbody tr{border-bottom:1px solid var(--border);transition:background 0.1s;}
+  tbody tr:hover:not(.sec-header){background:#f8fafc;}
+  td{padding:8px 12px;vertical-align:middle;}
+  td.num-cell{text-align:center;font-family:'JetBrains Mono',monospace;font-size:12px;font-weight:600;color:var(--text-muted);background:var(--surface2);}
+  td.content-cell{line-height:1.55;}
+  td.check-cell{text-align:center;padding:6px 8px;}
+  td.t1-cell{background:rgba(224,247,250,0.4);text-align:center;padding:6px 8px;}
+  td.t2-cell{background:rgba(243,232,255,0.4);text-align:center;padding:6px 8px;}
+
+  /* 조별 내용 분리 행 */
+  td.t1-content{background:rgba(224,247,250,0.4);font-size:12px;line-height:1.5;padding:7px 10px;color:var(--text-primary);}
+  td.t2-content{background:rgba(243,232,255,0.4);font-size:12px;line-height:1.5;padding:7px 10px;color:var(--text-primary);}
+  .team-tag{font-size:10px;font-weight:700;padding:1px 6px;border-radius:8px;margin-right:5px;display:inline-block;}
+  .tag-t1{background:var(--t1-bg);color:var(--t1-color);border:1px solid var(--t1-border);}
+  .tag-t2{background:var(--t2-bg);color:var(--t2-color);border:1px solid var(--t2-border);}
+
+  .ynd-group{display:flex;gap:3px;justify-content:center;}
+  .check-btn{width:28px;height:26px;border-radius:6px;border:1.5px solid var(--border-strong);background:var(--surface);font-family:'JetBrains Mono',monospace;font-size:10px;font-weight:700;cursor:pointer;color:var(--text-muted);transition:all 0.13s;display:flex;align-items:center;justify-content:center;}
+  .check-btn.active-y{background:var(--y-bg);border-color:var(--y-border);color:var(--y-color);}
+  .check-btn.active-n{background:var(--n-bg);border-color:var(--n-border);color:var(--n-color);}
+  .check-btn.active-d{background:var(--d-bg);border-color:var(--d-border);color:var(--d-color);}
+
+  .memo-section{background:var(--surface);border:1px solid var(--border);border-radius:var(--radius);box-shadow:var(--shadow);overflow:hidden;}
+  .memo-header{padding:13px 20px;border-bottom:1px solid var(--border);font-size:14px;font-weight:700;display:flex;align-items:center;gap:8px;}
+  .memo-body{padding:16px 20px;}
+  .memo-area{width:100%;padding:10px 12px;border:1.5px solid var(--border);border-radius:8px;background:var(--surface2);font-family:inherit;font-size:13px;color:var(--text-primary);resize:vertical;min-height:80px;line-height:1.5;transition:border-color 0.15s;}
+  .memo-area:focus{outline:none;border-color:var(--accent);background:#fff;}
+  .memo-area::placeholder{color:var(--text-muted);}
+
+  .modal-overlay{position:fixed;inset:0;background:rgba(0,0,0,0.45);display:flex;align-items:center;justify-content:center;z-index:1000;padding:24px;backdrop-filter:blur(3px);}
+  .modal-overlay.hidden{display:none;}
+  .modal-box{background:var(--surface);border-radius:14px;box-shadow:0 20px 60px rgba(0,0,0,0.25);width:100%;max-width:540px;max-height:88vh;display:flex;flex-direction:column;overflow:hidden;}
+  .modal-header{padding:20px 24px 16px;border-bottom:1px solid var(--border);display:flex;align-items:center;gap:10px;}
+  .modal-header h2{font-size:16px;font-weight:700;flex:1;}
+  .modal-close{width:30px;height:30px;border-radius:50%;border:none;background:var(--surface2);font-size:16px;cursor:pointer;color:var(--text-secondary);display:flex;align-items:center;justify-content:center;}
+  .modal-close:hover{background:var(--n-bg);color:var(--n-color);}
+  .modal-body{padding:20px 24px;overflow-y:auto;display:flex;flex-direction:column;gap:14px;}
+  .result-info{font-size:13px;color:var(--text-secondary);background:var(--surface2);padding:12px 16px;border-radius:8px;border-left:3px solid var(--accent);line-height:1.8;}
+  .result-section{display:flex;flex-direction:column;gap:6px;}
+  .result-section-label{font-size:12px;font-weight:700;color:var(--text-secondary);}
+  .result-row{display:flex;align-items:center;gap:10px;flex-wrap:wrap;}
+  .result-label{font-size:13px;font-weight:700;}
+  .result-pills{display:flex;gap:6px;}
+  .rp{padding:5px 14px;border-radius:20px;font-size:14px;font-weight:800;font-family:'JetBrains Mono',monospace;}
+  .rp-y{background:var(--y-bg);color:var(--y-color);border:1.5px solid var(--y-border);}
+  .rp-n{background:var(--n-bg);color:var(--n-color);border:1.5px solid var(--n-border);}
+  .rp-d{background:var(--d-bg);color:var(--d-color);border:1.5px solid var(--d-border);}
+  .result-memo{padding:10px 14px;background:var(--surface2);border-left:3px solid var(--accent);border-radius:0 6px 6px 0;font-size:12px;color:var(--text-secondary);line-height:1.6;white-space:pre-wrap;}
+  .result-memo-label{font-size:11px;font-weight:700;color:var(--accent);margin-bottom:4px;display:block;}
+
+  .toast{position:fixed;bottom:32px;left:50%;transform:translateX(-50%);background:#1e293b;color:#fff;padding:12px 22px;border-radius:10px;font-size:13px;font-weight:600;box-shadow:0 8px 24px rgba(0,0,0,0.25);z-index:2000;display:flex;align-items:center;gap:8px;animation:slideUp 0.25s ease;}
+  @keyframes slideUp{from{opacity:0;transform:translateX(-50%) translateY(16px);}to{opacity:1;transform:translateX(-50%) translateY(0);}}
+  tr.row-missing td{background:#fff5f5!important;}
+  tr.row-missing td.num-cell{background:#fed7d7!important;color:#dc2626!important;}
+  tr.row-missing td.t1-cell,tr.row-missing td.t2-cell{background:#fff5f5!important;}
+
+  .hidden{display:none!important;}
+  @media(max-width:860px){.main-wrap{grid-template-columns:1fr;}.sidebar{position:static;}}
+</style>
+</head>
+<body>
+
+<header class="site-header">
+  <div class="logo">🏥</div>
+  <div>
+    <h1>응급간호 종합시뮬레이션 체크리스트</h1>
+    <p>간호부문 공통 신입간호사 스타트(입문)교육</p>
+  </div>
+  <span class="header-badge">Y · N · D</span>
+</header>
+
+<div class="main-wrap">
+  <aside class="sidebar">
+
+    <div class="card">
+      <div class="card-header">📝 강사 / 교육생</div>
+      <div class="card-body" style="display:flex;flex-direction:column;gap:10px">
+        <div>
+          <span class="field-label">강사명 (최대 5자)</span>
+          <input type="text" class="text-input" id="instructorInput" maxlength="5" placeholder="강사명 입력">
+        </div>
+        <div>
+          <span class="field-label">교육생 명단 (최대 40자)</span>
+          <textarea class="textarea-input" id="teamInput" maxlength="40" placeholder="예) 김지수, 이민준, 박서연" oninput="onTeamInput()"></textarea>
+          <div class="char-count" id="charCount">0 / 40</div>
+        </div>
+        <button class="submit-btn" onclick="openResult()">📋 결과 제출</button>
+      </div>
+    </div>
+
+    <div class="card">
+      <div class="card-header">📋 섹션 이동</div>
+      <div class="nav-tabs">
+        <button class="nav-tab active" onclick="goToSection('sec-bls',this)">🔵 BLS (1~14)</button>
+        <button class="nav-tab" onclick="goToSection('sec-acls',this)">🔴 ACLS (15~26)</button>
+        <button class="nav-tab" onclick="goToSection('sec-rosc',this)">🟢 ROSC (27~29)</button>
+        <button class="nav-tab" onclick="goToSection('memo-section',this)">📝 메모</button>
+      </div>
+    </div>
+
+    <div class="card">
+      <div class="card-header">ℹ️ 체크 기준</div>
+      <div class="card-body">
+        <div class="legend-grid">
+          <div class="legend-item legend-y"><span class="legend-letter">Y</span>예 (수행)</div>
+          <div class="legend-item legend-n"><span class="legend-letter">N</span>아니오</div>
+          <div class="legend-item legend-d"><span class="legend-letter">D</span>디브리핑</div>
+        </div>
+        <p style="font-size:11px;color:var(--text-muted);margin-top:10px;line-height:1.7">
+          • Y+D 또는 N+D 동시 체크 가능<br>
+          • 버튼 재클릭 시 선택 해제<br>
+          • 모든 항목을 <span style="background:var(--t1-bg);color:var(--t1-color);padding:1px 5px;border-radius:4px;font-weight:700">1조</span>·<span style="background:var(--t2-bg);color:var(--t2-color);padding:1px 5px;border-radius:4px;font-weight:700">2조</span> 각각 체크
+        </p>
+      </div>
+    </div>
+
+  </aside>
+
+  <main class="content-area">
+
+    <div class="summary-bar">
+      <div style="display:flex;flex-direction:column;gap:4px">
+        <div style="display:flex;align-items:center;gap:6px"><span class="summary-label" style="color:var(--t1-color)">1조 전체</span>
+          <div class="summary-pills">
+            <span class="sp sp-y" id="sum-t1-y">Y 0</span>
+            <span class="sp sp-n" id="sum-t1-n">N 0</span>
+            <span class="sp sp-d" id="sum-t1-d">D 0</span>
+          </div>
+        </div>
+        <div style="display:flex;align-items:center;gap:6px">
+          <span class="summary-label" style="color:var(--t2-color)">2조 전체</span>
+          <div class="summary-pills">
+            <span class="sp sp-y" id="sum-t2-y">Y 0</span>
+            <span class="sp sp-n" id="sum-t2-n">N 0</span>
+            <span class="sp sp-d" id="sum-t2-d">D 0</span>
+          </div>
+        </div>
+      </div>
+      <span class="summary-team" id="summaryTeam" style="margin-left:auto;font-size:12px;color:var(--text-secondary)">교육생 명단을 입력해 주세요</span>
+    </div>
+
+    <div class="checklist-card" id="sec-bls">
+      <div class="checklist-header">
+        <span class="checklist-title">📋 체크리스트 (총 29개)</span>
+        <button class="reset-all-btn" onclick="resetAll()">전체 초기화</button>
+      </div>
+      <div class="table-wrapper">
+        <table>
+          <thead id="tableHead"></thead>
+          <tbody id="checklistBody"></tbody>
+        </table>
+      </div>
+    </div>
+
+    <div class="memo-section" id="memo-section">
+      <div class="memo-header">📝 메모</div>
+      <div class="memo-body">
+        <textarea class="memo-area" id="memoText" placeholder="메모를 입력하세요..."></textarea>
+      </div>
+    </div>
+
+  </main>
+</div>
+
+<div class="modal-overlay hidden" id="resultModal" onclick="closeResultOnOverlay(event)">
+  <div class="modal-box">
+    <div class="modal-header">
+      <span style="font-size:20px">📋</span>
+      <h2>응급간호 시뮬레이션 결과&nbsp;<span id="resultDate" style="font-size:13px;font-weight:500;color:var(--text-secondary)"></span></h2>
+      <button class="modal-close" onclick="closeResult()">✕</button>
+    </div>
+    <div class="modal-body" id="resultBody"></div>
+  </div>
+</div>
+
+<script>
+// ── 데이터 정의 ───────────────────────────────────────────
+// type: 'common' = 단일 체크 / 'dual' = 1조·2조 각각 체크
+const ITEMS = [
+  // BLS
+  {num:1,  sec:'BLS', scBg:'#e0f2fe', scTx:'#0369a1', type:'dual',
+   t1:'양쪽 어깨를 두드리며 큰소리로 불러 반응 없음을 확인한다.',
+   t2:'양쪽 어깨를 두드리며 큰소리로 불러 반응 없음을 확인한다.'},
+  {num:2,  sec:null, type:'dual',
+   t1:'도움(심정지 방송과 제세동기)을 요청한다.',
+   t2:'도움(심정지 방송과 제세동기)을 요청한다.'},
+  {num:3,  sec:null, type:'dual',
+   t1:'5-10초간 호흡(무호흡 또는 비정상호흡)과 맥박(경동맥, 대퇴동맥)을 동시에 확인한다.',
+   t2:'5-10초간 호흡(무호흡 또는 비정상호흡)과 맥박(경동맥, 대퇴동맥)을 동시에 확인한다.'},
+  {num:4,  sec:null, type:'dual',
+   t1:'고품질의 가슴압박을 시행한다.',
+   t2:'고품질의 가슴압박을 시행한다.'},
+  {num:5,  sec:null, type:'dual',
+   t1:'도움요청을 듣고 원내 3000번 신고를 한 후 E-cart(제세동기)를 가져간다.',
+   t2:'도움요청을 듣고 원내 3000번 신고를 한 후 E-cart(제세동기)를 가져간다.'},
+  {num:6,  sec:null, type:'dual',
+   t1:'Defibrillation mode로 제세동기를 켠다.',
+   t2:'Defibrillation mode로 제세동기를 켠다.'},
+  {num:7,  sec:null, type:'dual',
+   t1:'Pads를 정확한 위치에 부착한다.',
+   t2:'Pads를 정확한 위치에 부착한다.'},
+  {num:8,  sec:null, type:'dual',
+   t1:'Paddle에 연결된 Multifunction cable을 분리하여 Pads와 연결한다.',
+   t2:'Paddle에 연결된 Multifunction cable을 분리하여 Pads와 연결한다.'},
+  {num:9,  sec:null, type:'dual',
+   t1:'Lead를 확인한 후 (필요 시)Pads로 lead를 변경한다.',
+   t2:'Lead를 확인한 후 (필요 시)Pads로 lead를 변경한다.'},
+  {num:10, sec:null, type:'dual',
+   t1:'Ambu에 fitting mask, reservior bag, O2 line을 연결하여 30:2의 비율로 인공호흡을 실시한다.',
+   t2:'Ambu에 fitting mask, reservior bag, O2 line을 연결하여 30:2의 비율로 인공호흡을 실시한다.'},
+  {num:11, sec:null, type:'dual',
+   t1:'CPR 팀이 도착하면 환자를 돌려 등 밑에 CPR board를 넣는다.',
+   t2:'CPR 팀이 도착하면 환자를 돌려 등 밑에 CPR board를 넣는다.'},
+  {num:12, sec:null, type:'dual',
+   t1:'최소한의 중단으로 가슴압박을 교대한다.',
+   t2:'최소한의 중단으로 가슴압박을 교대한다.'},
+  {num:13, sec:null, type:'dual',
+   t1:'교대 후 담당간호사는 기록을 시작한다.',
+   t2:'교대 후 담당간호사는 기록을 시작한다.'},
+  {num:14, sec:null, type:'dual',
+   t1:'동료 간호사는 인공호흡을 교대한 후 제세동기를 담당한다.',
+   t2:'동료 간호사는 인공호흡을 교대한 후 제세동기를 담당한다.'},
+
+  // ACLS — dual (1조·2조 각각 다른 내용 + 각각 체크)
+  {num:15, sec:'ACLS', scBg:'#fee2e2', scTx:'#dc2626', type:'dual',
+   t1:'[리듬 확인] 심전도 리듬을 출력한다. 🏷️ 1조: V.fib',
+   t2:'[리듬 확인] 심전도 리듬을 출력한다. 🏷️ 2조: Pulseless V-tach'},
+  {num:16, sec:null, type:'dual',
+   t1:'맥박(경동맥)을 확인한 후 "맥박이 없습니다" 라고 말한다.',
+   t2:'맥박(경동맥)을 확인한 후 "맥박이 없습니다" 라고 말한다.'},
+  {num:17, sec:null, type:'dual',
+   t1:'제세동이 준비되는 동안 가슴압박을 지속한다.',
+   t2:'제세동이 준비되는 동안 가슴압박을 지속한다.'},
+  {num:18, sec:null, type:'dual',
+   t1:'강사가 말한 에너지에 정확히 맞춘다. (150J, 200J)',
+   t2:'강사가 말한 에너지에 정확히 맞춘다. (150J, 200J)'},
+  {num:19, sec:null, type:'dual',
+   t1:'Charge button을 눌러 충전한다.',
+   t2:'Charge button을 눌러 충전한다.'},
+  {num:20, sec:null, type:'dual',
+   t1:'충전이 완료되면 "모두 물러나세요" 라고 말한다.',
+   t2:'충전이 완료되면 "모두 물러나세요" 라고 말한다.'},
+  {num:21, sec:null, type:'dual',
+   t1:'모두 물러났음을 확인한 후 shock 버튼을 누른다.',
+   t2:'모두 물러났음을 확인한 후 shock 버튼을 누른다.'},
+  {num:22, sec:null, type:'dual',
+   t1:'Shock이 끝나면 바로 가슴압박을 시작한다.',
+   t2:'Shock이 끝나면 바로 가슴압박을 시작한다.'},
+  {num:23, sec:null, type:'dual',
+   t1:'[2분 경과] 심전도 리듬을 출력한다. 🏷️ 1조: PEA',
+   t2:'[2분 경과] 심전도 리듬을 출력한다. 🏷️ 2조: Asystole'},
+  {num:24, sec:null, type:'dual',
+   t1:'맥박(경동맥)을 확인한 후 "맥박이 없습니다" 라고 말한다.',
+   t2:'맥박(경동맥)을 확인한 후 "맥박이 없습니다" 라고 말한다.'},
+  {num:25, sec:null, type:'dual',
+   t1:'바로 가슴압박을 시작한다.',
+   t2:'Asystole임을 확인하고 바로 가슴압박을 시작한다.'},
+  {num:26, sec:null, type:'dual',
+   t1:'"Epinephrine 1mg을 투여하겠습니다" 라고 말한다.',
+   t2:'"Epinephrine 1mg을 투여하겠습니다" 라고 말한다.'},
+
+  // ROSC
+  {num:27, sec:'ROSC', scBg:'#dcfce7', scTx:'#16a34a', type:'dual',
+   t1:'(강사가) "리듬을 확인하겠습니다" (라고 말하면) 심전도 리듬을 출력한다.',
+   t2:'(강사가) "리듬을 확인하겠습니다" (라고 말하면) 심전도 리듬을 출력한다.'},
+  {num:28, sec:null, type:'dual',
+   t1:'맥박(경동맥)을 확인한다.',
+   t2:'맥박(경동맥)을 확인한다.'},
+  {num:29, sec:null, type:'dual',
+   t1:'ROSC 되었음을 알린다.',
+   t2:'ROSC 되었음을 알린다.'},
+];
+
+const SEC_IDS = { 'ACLS':'sec-acls', 'ROSC':'sec-rosc' };
+
+// ── STATE ─────────────────────────────────────────────────
+// checksCommon[num] = {Y,N,D}
+// checksDual[team][num] = {Y,N,D}
+let checksCommon = {};
+let checksDual = { t1:{}, t2:{} };
+
+function getCommon(num) {
+  if (!checksCommon[num]) checksCommon[num]={Y:false,N:false,D:false};
+  return checksCommon[num];
+}
+function getDual(team, num) {
+  if (!checksDual[team][num]) checksDual[team][num]={Y:false,N:false,D:false};
+  return checksDual[team][num];
+}
+function countCommon(v){ return Object.values(checksCommon).filter(c=>c[v]).length; }
+function countDual(team,v){ return Object.values(checksDual[team]).filter(c=>c[v]).length; }
+
+// ── TOGGLE ────────────────────────────────────────────────
+function toggleCommon(num, val) {
+  const c = getCommon(num);
+  if (val==='Y'){c.Y=!c.Y;if(c.Y)c.N=false;}
+  else if(val==='N'){c.N=!c.N;if(c.N)c.Y=false;}
+  else{c.D=!c.D;}
+  refreshCommonBtns(num);
+  const row=document.getElementById('row-'+num);
+  if(row&&(c.Y||c.N||c.D)) row.classList.remove('row-missing');
+  updateTotals();
+}
+
+function toggleDual(team, num, val) {
+  const c = getDual(team, num);
+  if(val==='Y'){c.Y=!c.Y;if(c.Y)c.N=false;}
+  else if(val==='N'){c.N=!c.N;if(c.N)c.Y=false;}
+  else{c.D=!c.D;}
+  refreshDualBtns(team, num);
+  updateTotals();
+}
+
+function refreshCommonBtns(num) {
+  const c = getCommon(num);
+  ['Y','N','D'].forEach(v=>{
+    const b=document.getElementById(`cb-${num}-${v}`);
+    if(b) b.className='check-btn'+(c[v]?' active-'+v.toLowerCase():'');
+  });
+}
+
+function refreshDualBtns(team, num) {
+  const c = getDual(team, num);
+  ['Y','N','D'].forEach(v=>{
+    const b=document.getElementById(`db-${team}-${num}-${v}`);
+    if(b) b.className='check-btn'+(c[v]?' active-'+v.toLowerCase():'');
+  });
+}
+
+function updateTotals() {
+  ['y','n','d'].forEach(v=>{
+    const V=v.toUpperCase();
+    document.getElementById('sum-t1-'+v).textContent=V+' '+countDual('t1',V);
+    document.getElementById('sum-t2-'+v).textContent=V+' '+countDual('t2',V);
+  });
+}
+
+// ── RENDER ────────────────────────────────────────────────
+function renderTable() {
+  // thead
+  document.getElementById('tableHead').innerHTML=`<tr>
+    <th class="col-num">연번</th>
+    <th class="col-content">내용</th>
+    <th class="col-t1">🔵 1조</th>
+    <th class="col-t2">🟣 2조</th>
+  </tr>`;
+
+  const tbody = document.getElementById('checklistBody');
+  let html='';
+  ITEMS.forEach(item=>{
+    if(item.sec){
+      const aid=SEC_IDS[item.sec]?` id="${SEC_IDS[item.sec]}"` :'';
+      const colspan = 4;
+      html+=`<tr class="sec-header"${aid}><td colspan="${colspan}"><span class="sec-badge" style="background:${item.scBg};color:${item.scTx}">${item.sec}</span></td></tr>`;
+    }
+    {
+      // 모든 항목 dual 처리
+      const t1c=getDual('t1',item.num);
+      const t2c=getDual('t2',item.num);
+      const sameText = item.t1===item.t2;
+      html+=`<tr id="row-${item.num}">
+        <td class="num-cell">${item.num}</td>
+        <td class="content-cell" style="padding:0">
+          ${sameText
+            ? `<div style="padding:8px 12px">${item.t1}</div>`
+            : `<div class="t1-content"><span class="team-tag tag-t1">1조</span>${item.t1}</div>
+               <div class="t2-content"><span class="team-tag tag-t2">2조</span>${item.t2}</div>`
+          }
+        </td>
+        <td class="t1-cell">
+          <div class="ynd-group">
+            <button id="db-t1-${item.num}-Y" class="check-btn${t1c.Y?' active-y':''}" onclick="toggleDual('t1',${item.num},'Y')">Y</button>
+            <button id="db-t1-${item.num}-N" class="check-btn${t1c.N?' active-n':''}" onclick="toggleDual('t1',${item.num},'N')">N</button>
+            <button id="db-t1-${item.num}-D" class="check-btn${t1c.D?' active-d':''}" onclick="toggleDual('t1',${item.num},'D')">D</button>
+          </div>
+        </td>
+        <td class="t2-cell">
+          <div class="ynd-group">
+            <button id="db-t2-${item.num}-Y" class="check-btn${t2c.Y?' active-y':''}" onclick="toggleDual('t2',${item.num},'Y')">Y</button>
+            <button id="db-t2-${item.num}-N" class="check-btn${t2c.N?' active-n':''}" onclick="toggleDual('t2',${item.num},'N')">N</button>
+            <button id="db-t2-${item.num}-D" class="check-btn${t2c.D?' active-d':''}" onclick="toggleDual('t2',${item.num},'D')">D</button>
+          </div>
+        </td>
+      </tr>`;
+    }
+  });
+  tbody.innerHTML=html;
+}
+
+function resetAll(){
+  if(!confirm('모든 체크를 초기화하시겠습니까?')) return;
+  checksDual={t1:{},t2:{}};
+  renderTable();
+  updateTotals();
+}
+
+function onTeamInput(){
+  const val=document.getElementById('teamInput').value;
+  const cc=document.getElementById('charCount');
+  cc.textContent=val.length+' / 40';
+  cc.className='char-count'+(val.length>=36?' warn':'');
+  document.getElementById('summaryTeam').textContent=val.trim()?'👥 '+val.trim():'교육생 명단을 입력해 주세요';
+}
+
+function goToSection(id,btn){
+  const el=document.getElementById(id);
+  if(!el) return;
+  el.scrollIntoView({behavior:'smooth',block:'start'});
+  document.querySelectorAll('.nav-tab').forEach(t=>t.classList.remove('active'));
+  btn.classList.add('active');
+}
+
+let toastTimer=null;
+function showToast(msg){
+  const old=document.getElementById('vt');
+  if(old) old.remove();
+  if(toastTimer) clearTimeout(toastTimer);
+  const t=document.createElement('div');
+  t.id='vt';t.className='toast';t.innerHTML='⚠️ '+msg;
+  document.body.appendChild(t);
+  toastTimer=setTimeout(()=>t.remove(),3500);
+}
+
+function openResult(){
+  document.querySelectorAll('tr.row-missing').forEach(r=>r.classList.remove('row-missing'));
+
+  const today=new Date();
+  document.getElementById('resultDate').textContent=
+    `${today.getFullYear()}-${String(today.getMonth()+1).padStart(2,'0')}-${String(today.getDate()).padStart(2,'0')}`;
+
+  const instructor=document.getElementById('instructorInput').value.trim();
+  const team=document.getElementById('teamInput').value.trim();
+  const memo=document.getElementById('memoText').value.trim();
+
+  const t1y=countDual('t1','Y'), t1n=countDual('t1','N'), t1d=countDual('t1','D');
+  const t2y=countDual('t2','Y'), t2n=countDual('t2','N'), t2d=countDual('t2','D');
+
+  // 평균: Y/N/D 각각 두 조의 평균 (소수점 첫째 자리)
+  const avgY = ((t1y+t2y)/2).toFixed(1);
+  const avgN = ((t1n+t2n)/2).toFixed(1);
+  const avgD = ((t1d+t2d)/2).toFixed(1);
+
+  let html='<div class="result-info">';
+  if(instructor) html+=`<strong>🎓 강사</strong>&nbsp;&nbsp;${instructor.replace(/</g,'&lt;')}<br>`;
+  if(team) html+=`<strong>👥 교육생</strong>&nbsp;&nbsp;${team.replace(/</g,'&lt;')}<br>`;
+  html+='</div>';
+
+  // 1조 합계
+  html+=`<div class="result-section">
+    <div class="result-section-label" style="color:var(--t1-color)">🔵 1조 합계</div>
+    <div class="result-row"><div class="result-pills">
+      <span class="rp rp-y">Y ${t1y}</span>
+      <span class="rp rp-n">N ${t1n}</span>
+      <span class="rp rp-d">D ${t1d}</span>
+    </div></div>
+  </div>`;
+
+  // 2조 합계
+  html+=`<div class="result-section">
+    <div class="result-section-label" style="color:var(--t2-color)">🟣 2조 합계</div>
+    <div class="result-row"><div class="result-pills">
+      <span class="rp rp-y">Y ${t2y}</span>
+      <span class="rp rp-n">N ${t2n}</span>
+      <span class="rp rp-d">D ${t2d}</span>
+    </div></div>
+  </div>`;
+
+  // 구분선
+  html+=`<div style="border-top:2px solid var(--border-strong);margin:4px 0"></div>`;
+
+  // 두 조 평균
+  html+=`<div class="result-section">
+    <div class="result-section-label" style="color:var(--text-primary);font-size:13px">📊 최종 평균 (1조 + 2조)</div>
+    <div class="result-row"><div class="result-pills">
+      <span class="rp rp-y">Y ${avgY}</span>
+      <span class="rp rp-n">N ${avgN}</span>
+      <span class="rp rp-d">D ${avgD}</span>
+    </div></div>
+  </div>`;
+
+  if(memo) html+=`<div class="result-memo"><span class="result-memo-label">📝 메모</span>${memo.replace(/</g,'&lt;').replace(/>/g,'&gt;')}</div>`;
+
+  document.getElementById('resultBody').innerHTML=html;
+  document.getElementById('resultModal').classList.remove('hidden');
+}
+
+function closeResult(){document.getElementById('resultModal').classList.add('hidden');}
+function closeResultOnOverlay(e){if(e.target===document.getElementById('resultModal')) closeResult();}
+
+renderTable();
+updateTotals();
+</script>
+</body>
+</html>

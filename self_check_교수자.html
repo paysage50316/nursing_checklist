@@ -1,0 +1,738 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>교수자로서의 자기 점검표</title>
+<link href="https://fonts.googleapis.com/css2?family=Noto+Serif+KR:wght@400;600;700&family=Noto+Sans+KR:wght@300;400;500;600&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --bg: #f7f5f0;
+    --surface: #ffffff;
+    --surface2: #faf9f6;
+    --border: #e8e4dc;
+    --border-strong: #d4cfc4;
+    --text-primary: #1c1a16;
+    --text-secondary: #6b6456;
+    --text-muted: #a89e90;
+    --accent: #2c5282;
+    --accent-light: #ebf4ff;
+    --gold: #b7860b;
+    --gold-light: #fef9e7;
+    --radius: 10px;
+    --shadow: 0 2px 8px rgba(0,0,0,0.07);
+    --shadow-lg: 0 8px 32px rgba(0,0,0,0.12);
+  }
+
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+
+  body {
+    font-family: 'Noto Sans KR', sans-serif;
+    background: var(--bg);
+    color: var(--text-primary);
+    min-height: 100vh;
+    line-height: 1.6;
+  }
+
+  /* HEADER */
+  .page-header {
+    background: var(--accent);
+    color: #fff;
+    padding: 28px 40px 24px;
+    text-align: center;
+    position: relative;
+    overflow: hidden;
+  }
+  .page-header::before {
+    content: '';
+    position: absolute; inset: 0;
+    background: repeating-linear-gradient(
+      45deg, transparent, transparent 40px,
+      rgba(255,255,255,0.03) 40px, rgba(255,255,255,0.03) 80px
+    );
+  }
+  .page-header h1 {
+    font-family: 'Noto Serif KR', serif;
+    font-size: 22px; font-weight: 700;
+    letter-spacing: 0.5px;
+    position: relative;
+  }
+  .page-header p {
+    font-size: 12px; opacity: 0.7; margin-top: 4px;
+    position: relative;
+  }
+
+  /* CONTAINER */
+  .container {
+    max-width: 860px;
+    margin: 32px auto;
+    padding: 0 20px 60px;
+    display: flex;
+    flex-direction: column;
+    gap: 20px;
+  }
+
+  /* INFO CARD */
+  .info-card {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: var(--radius);
+    box-shadow: var(--shadow);
+    overflow: hidden;
+  }
+  .info-card-header {
+    padding: 14px 20px;
+    background: var(--surface2);
+    border-bottom: 1px solid var(--border);
+    font-size: 13px; font-weight: 700;
+    color: var(--text-secondary);
+    display: flex; align-items: center; gap: 8px;
+  }
+  .info-grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 0;
+  }
+  .info-field {
+    padding: 14px 20px;
+    border-bottom: 1px solid var(--border);
+    display: flex;
+    flex-direction: column;
+    gap: 5px;
+  }
+  .info-field:nth-child(odd) { border-right: 1px solid var(--border); }
+  .info-field.full-width {
+    grid-column: 1 / -1;
+    border-right: none;
+  }
+  .info-field:last-child, .info-field:nth-last-child(2):nth-child(odd) {
+    border-bottom: none;
+  }
+  .info-label {
+    font-size: 11px; font-weight: 700;
+    color: var(--text-muted);
+    letter-spacing: 0.5px;
+    text-transform: uppercase;
+  }
+  .info-value {
+    font-size: 14px; color: var(--text-primary);
+    font-weight: 500;
+  }
+  .info-input {
+    border: none; outline: none;
+    font-family: inherit; font-size: 14px;
+    color: var(--text-primary);
+    background: transparent;
+    width: 100%;
+    font-weight: 500;
+  }
+  .info-input::placeholder { color: var(--text-muted); font-weight: 400; }
+  .info-fixed {
+    font-size: 14px; font-weight: 500;
+    color: var(--text-secondary);
+  }
+
+  /* DESCRIPTION */
+  .description-box {
+    background: var(--accent-light);
+    border: 1px solid #bee3f8;
+    border-radius: var(--radius);
+    padding: 16px 20px;
+    font-size: 13px;
+    color: var(--accent);
+    line-height: 1.7;
+  }
+  .description-box strong { font-weight: 700; }
+
+  /* SCALE LEGEND */
+  .scale-box {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: var(--radius);
+    padding: 14px 20px;
+    box-shadow: var(--shadow);
+  }
+  .scale-title { font-size: 12px; font-weight: 700; color: var(--text-secondary); margin-bottom: 10px; }
+  .scale-pills {
+    display: flex; gap: 8px; flex-wrap: wrap;
+  }
+  .scale-pill {
+    padding: 4px 12px;
+    border-radius: 20px;
+    font-size: 12px; font-weight: 600;
+    border: 1.5px solid;
+    white-space: nowrap;
+  }
+  .sp5 { background: #f0fff4; color: #276749; border-color: #9ae6b4; }
+  .sp4 { background: #ebf8ff; color: #2b6cb0; border-color: #90cdf4; }
+  .sp3 { background: #fefcbf; color: #744210; border-color: #f6e05e; }
+  .sp2 { background: #fff5f5; color: #9b2c2c; border-color: #fed7d7; }
+  .sp1 { background: #fff5f5; color: #c53030; border-color: #fc8181; }
+  .spN { background: #f7fafc; color: #718096; border-color: #e2e8f0; }
+
+  /* CHECKLIST CARD */
+  .checklist-card {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: var(--radius);
+    box-shadow: var(--shadow);
+    overflow: hidden;
+  }
+  .checklist-header {
+    padding: 14px 20px;
+    background: var(--surface2);
+    border-bottom: 2px solid var(--border-strong);
+    display: flex; align-items: center; justify-content: space-between;
+    gap: 10px;
+  }
+  .checklist-header-title { font-size: 14px; font-weight: 700; }
+  .reset-btn {
+    padding: 5px 12px; border: 1px solid var(--border-strong);
+    border-radius: 6px; background: var(--surface);
+    font-family: inherit; font-size: 11px; font-weight: 600;
+    color: var(--text-secondary); cursor: pointer; transition: all 0.15s;
+  }
+  .reset-btn:hover { background: #fff5f5; border-color: #fc8181; color: #c53030; }
+
+  table { width: 100%; border-collapse: collapse; font-size: 13px; }
+  thead th {
+    padding: 10px 12px;
+    background: #f0f4f8;
+    font-size: 11px; font-weight: 700;
+    color: var(--text-secondary);
+    border-bottom: 2px solid var(--border-strong);
+    text-align: center;
+    white-space: nowrap;
+  }
+  thead th.th-num { width: 44px; }
+  thead th.th-content { text-align: left; }
+  thead th.th-score { width: 54px; }
+  thead th.th-na { width: 60px; }
+
+  tbody tr { border-bottom: 1px solid var(--border); transition: background 0.1s; }
+  tbody tr:hover { background: #faf9f6; }
+  tbody tr.row-answered { background: #f7fdf9; }
+  tbody tr:last-child { border-bottom: none; }
+
+  td { padding: 10px 12px; vertical-align: middle; }
+  td.num-cell {
+    text-align: center; font-weight: 700; font-size: 12px;
+    color: var(--text-muted);
+    background: var(--surface2);
+  }
+  td.content-cell { line-height: 1.55; }
+
+  /* 점수 버튼 그룹 */
+  .score-group { display: flex; gap: 4px; justify-content: center; }
+  .score-btn {
+    width: 36px; height: 32px;
+    border-radius: 6px;
+    border: 1.5px solid var(--border-strong);
+    background: var(--surface);
+    font-family: inherit; font-size: 13px; font-weight: 700;
+    cursor: pointer; color: var(--text-muted);
+    transition: all 0.13s;
+    display: flex; align-items: center; justify-content: center;
+  }
+  .score-btn:hover { border-color: var(--accent); color: var(--accent); background: var(--accent-light); }
+  .score-btn.active-5 { background: #f0fff4; border-color: #9ae6b4; color: #276749; }
+  .score-btn.active-4 { background: #ebf8ff; border-color: #90cdf4; color: #2b6cb0; }
+  .score-btn.active-3 { background: #fefcbf; border-color: #f6e05e; color: #744210; }
+  .score-btn.active-2 { background: #fff5f5; border-color: #fed7d7; color: #9b2c2c; }
+  .score-btn.active-1 { background: #fff5f5; border-color: #fc8181; color: #c53030; }
+
+  .na-btn {
+    padding: 5px 10px;
+    border-radius: 6px;
+    border: 1.5px solid var(--border-strong);
+    background: var(--surface);
+    font-family: inherit; font-size: 11px; font-weight: 600;
+    cursor: pointer; color: var(--text-muted);
+    transition: all 0.13s;
+  }
+  .na-btn.active-na { background: #f7fafc; border-color: #a0aec0; color: #4a5568; }
+
+  /* SCORE SUMMARY */
+  .score-summary {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: var(--radius);
+    box-shadow: var(--shadow);
+    overflow: hidden;
+  }
+  .score-summary-header {
+    padding: 14px 20px;
+    background: var(--surface2);
+    border-bottom: 1px solid var(--border);
+    font-size: 13px; font-weight: 700;
+    color: var(--text-secondary);
+  }
+  .score-summary-body { padding: 20px; }
+  .score-display {
+    display: flex; align-items: center; gap: 20px; flex-wrap: wrap;
+    margin-bottom: 16px;
+  }
+  .score-number {
+    font-family: 'Noto Serif KR', serif;
+    font-size: 52px; font-weight: 700;
+    color: var(--accent);
+    line-height: 1;
+  }
+  .score-max { font-size: 18px; color: var(--text-muted); font-weight: 400; }
+  .score-grade {
+    padding: 8px 18px; border-radius: 20px;
+    font-size: 15px; font-weight: 700;
+    border: 2px solid;
+  }
+  .grade-5 { background: #f0fff4; color: #276749; border-color: #9ae6b4; }
+  .grade-4 { background: #ebf8ff; color: #2b6cb0; border-color: #90cdf4; }
+  .grade-3 { background: #fefcbf; color: #744210; border-color: #f6e05e; }
+  .grade-2 { background: #fff5f5; color: #9b2c2c; border-color: #fed7d7; }
+  .grade-1 { background: #fff5f5; color: #c53030; border-color: #fc8181; }
+
+  /* 진행 바 */
+  .progress-wrap { margin-top: 4px; }
+  .progress-label { font-size: 11px; color: var(--text-muted); margin-bottom: 5px; }
+  .progress-bar-bg {
+    width: 100%; height: 8px;
+    background: var(--border);
+    border-radius: 4px; overflow: hidden;
+  }
+  .progress-bar-fill {
+    height: 100%; border-radius: 4px;
+    background: var(--accent);
+    transition: width 0.4s ease;
+  }
+
+  /* 등급 기준 */
+  .grade-legend {
+    display: flex; gap: 8px; flex-wrap: wrap; margin-top: 14px;
+  }
+  .grade-badge {
+    padding: 3px 10px; border-radius: 12px;
+    font-size: 11px; font-weight: 600;
+    border: 1px solid;
+  }
+
+  /* SUBMIT */
+  .submit-btn {
+    width: 100%; padding: 14px;
+    border: none; border-radius: var(--radius);
+    background: var(--accent); color: #fff;
+    font-family: inherit; font-size: 15px; font-weight: 700;
+    cursor: pointer; transition: background 0.15s;
+    display: flex; align-items: center; justify-content: center; gap: 8px;
+  }
+  .submit-btn:hover { background: #2a4a7f; }
+  .submit-btn:disabled { background: var(--border-strong); cursor: not-allowed; }
+
+  /* MODAL */
+  .modal-overlay {
+    position: fixed; inset: 0;
+    background: rgba(0,0,0,0.5);
+    display: flex; align-items: center; justify-content: center;
+    z-index: 1000; padding: 24px;
+    backdrop-filter: blur(4px);
+  }
+  .modal-overlay.hidden { display: none; }
+  .modal-box {
+    background: var(--surface);
+    border-radius: 14px;
+    box-shadow: var(--shadow-lg);
+    width: 100%; max-width: 560px;
+    max-height: 88vh;
+    display: flex; flex-direction: column;
+    overflow: hidden;
+  }
+  .modal-header {
+    padding: 20px 24px 16px;
+    border-bottom: 1px solid var(--border);
+    display: flex; align-items: center; gap: 10px;
+    background: var(--accent); color: #fff;
+  }
+  .modal-header h2 { font-family: 'Noto Serif KR', serif; font-size: 16px; font-weight: 700; flex: 1; }
+  .modal-close {
+    width: 30px; height: 30px; border-radius: 50%;
+    border: none; background: rgba(255,255,255,0.2);
+    font-size: 16px; cursor: pointer; color: #fff;
+    display: flex; align-items: center; justify-content: center;
+  }
+  .modal-body { padding: 24px; overflow-y: auto; display: flex; flex-direction: column; gap: 16px; }
+
+  .result-info-grid {
+    display: grid; grid-template-columns: 1fr 1fr; gap: 8px;
+  }
+  .result-info-item {
+    padding: 10px 14px;
+    background: var(--surface2);
+    border: 1px solid var(--border);
+    border-radius: 8px;
+  }
+  .result-info-item.full { grid-column: 1 / -1; }
+  .result-info-label { font-size: 10px; font-weight: 700; color: var(--text-muted); text-transform: uppercase; margin-bottom: 2px; }
+  .result-info-value { font-size: 13px; font-weight: 600; color: var(--text-primary); }
+
+  .result-score-box {
+    background: var(--accent-light);
+    border: 1px solid #bee3f8;
+    border-radius: 10px;
+    padding: 20px;
+    display: flex; align-items: center; gap: 20px; flex-wrap: wrap;
+  }
+  .result-score-num {
+    font-family: 'Noto Serif KR', serif;
+    font-size: 56px; font-weight: 700;
+    color: var(--accent); line-height: 1;
+  }
+  .result-score-detail { display: flex; flex-direction: column; gap: 6px; }
+  .result-score-max { font-size: 14px; color: var(--text-muted); }
+  .result-grade-badge {
+    padding: 6px 16px; border-radius: 20px;
+    font-size: 14px; font-weight: 700;
+    border: 2px solid; display: inline-block;
+  }
+
+  .toast {
+    position: fixed; bottom: 32px; left: 50%; transform: translateX(-50%);
+    background: #1e293b; color: #fff;
+    padding: 12px 22px; border-radius: 10px;
+    font-size: 13px; font-weight: 600;
+    box-shadow: 0 8px 24px rgba(0,0,0,0.25);
+    z-index: 2000; display: flex; align-items: center; gap: 8px;
+    animation: slideUp 0.25s ease;
+    white-space: nowrap;
+  }
+  @keyframes slideUp { from { opacity:0; transform: translateX(-50%) translateY(16px); } to { opacity:1; transform: translateX(-50%) translateY(0); } }
+
+  tr.row-missing td { background: #fff5f5 !important; }
+  tr.row-missing td.num-cell { background: #fed7d7 !important; color: #c53030 !important; }
+
+  .hidden { display: none !important; }
+  @media (max-width: 640px) {
+    .info-grid { grid-template-columns: 1fr; }
+    .info-field:nth-child(odd) { border-right: none; }
+    .score-group { gap: 3px; }
+    .score-btn { width: 32px; height: 30px; font-size: 12px; }
+  }
+</style>
+</head>
+<body>
+
+<header class="page-header">
+  <h1>교수자로서의 자기 점검표</h1>
+  <p>간호부문 공통 신입간호사 스타트(입문)교육</p>
+</header>
+
+<div class="container">
+
+  <!-- 기본 정보 -->
+  <div class="info-card">
+    <div class="info-card-header">📋 기본 정보</div>
+    <div class="info-grid">
+      <div class="info-field">
+        <span class="info-label">강사 이름</span>
+        <input class="info-input" id="nameInput" type="text" maxlength="10" placeholder="이름을 입력하세요">
+      </div>
+      <div class="info-field">
+        <span class="info-label">소속</span>
+        <input class="info-input" id="deptInput" type="text" maxlength="20" placeholder="소속을 입력하세요">
+      </div>
+      <div class="info-field">
+        <span class="info-label">날짜</span>
+        <span class="info-fixed" id="todayDate">—</span>
+      </div>
+      <div class="info-field">
+        <span class="info-label">장소</span>
+        <span class="info-fixed">샤인센터</span>
+      </div>
+      <div class="info-field full-width">
+        <span class="info-label">강의 주제</span>
+        <input class="info-input" id="topicInput" type="text" maxlength="50" placeholder="강의 주제를 입력하세요">
+      </div>
+    </div>
+  </div>
+
+  <!-- 안내문 -->
+  <div class="description-box">
+    다음 자기 점검표는 자신이 어떤 교수자인지 뒤돌아 보는 시간을 통하여 한걸음 앞으로 나아가기 위하여 사용합니다.<br>
+    아래 진술에 대하여 <strong>자신을 가장 정확하게 표현하는 곳에 표시</strong>하고 채점해봅시다.
+  </div>
+
+  <!-- 척도 안내 -->
+  <div class="scale-box">
+    <div class="scale-title">📊 Scale 기준</div>
+    <div class="scale-pills">
+      <span class="scale-pill sp5">5 = 항상 그렇다</span>
+      <span class="scale-pill sp4">4 = 대체로 그렇다</span>
+      <span class="scale-pill sp3">3 = 보통이다</span>
+      <span class="scale-pill sp2">2 = 대체로 그렇지 않다</span>
+      <span class="scale-pill sp1">1 = 전혀 그렇지 않다</span>
+      <span class="scale-pill spN">해당 없음</span>
+    </div>
+  </div>
+
+  <!-- 체크리스트 -->
+  <div class="checklist-card">
+    <div class="checklist-header">
+      <span class="checklist-header-title">✅ 자기 점검 항목 (총 20개)</span>
+      <button class="reset-btn" onclick="resetAll()">전체 초기화</button>
+    </div>
+    <div style="overflow-x:auto">
+      <table>
+        <thead>
+          <tr>
+            <th class="th-num">연번</th>
+            <th class="th-content">문항</th>
+            <th class="th-score" style="width:220px">5 &nbsp; 4 &nbsp; 3 &nbsp; 2 &nbsp; 1</th>
+            <th class="th-na">해당없음</th>
+          </tr>
+        </thead>
+        <tbody id="checkBody"></tbody>
+      </table>
+    </div>
+  </div>
+
+  <!-- 점수 요약 -->
+  <div class="score-summary">
+    <div class="score-summary-header">📈 현재 점수</div>
+    <div class="score-summary-body">
+      <div class="score-display">
+        <div>
+          <span class="score-number" id="scoreNum">0</span>
+          <span class="score-max" id="scoreMax"> / 100점</span>
+        </div>
+        <span class="score-grade grade-3" id="scoreGrade">—</span>
+      </div>
+      <div class="progress-wrap">
+        <div class="progress-label" id="progressLabel">0 / 20개 응답완료</div>
+        <div class="progress-bar-bg">
+          <div class="progress-bar-fill" id="progressBar" style="width:0%"></div>
+        </div>
+      </div>
+      <div class="grade-legend">
+        <span class="grade-badge grade-5">85점↑ 매우 훌륭함</span>
+        <span class="grade-badge grade-4">70점↑ 훌륭함</span>
+        <span class="grade-badge grade-3">50점↑ 보통</span>
+        <span class="grade-badge grade-2">30점↑ 약함</span>
+        <span class="grade-badge grade-1">30점↓ 아주 약함</span>
+      </div>
+    </div>
+  </div>
+
+  <!-- 제출 버튼 -->
+  <button class="submit-btn" id="submitBtn" onclick="openResult()">
+    📋 결과 제출
+  </button>
+
+</div>
+
+<!-- RESULT MODAL -->
+<div class="modal-overlay hidden" id="resultModal" onclick="closeResultOnOverlay(event)">
+  <div class="modal-box">
+    <div class="modal-header">
+      <span style="font-size:18px">📋</span>
+      <h2>교수자 자기 점검표 결과</h2>
+      <button class="modal-close" onclick="closeResult()">✕</button>
+    </div>
+    <div class="modal-body" id="resultBody"></div>
+  </div>
+</div>
+
+<script>
+const ITEMS = [
+  '강의하기 전에 미리 학습자에 대해 조사한다.',
+  '강의를 위해 교안을 작성한다.',
+  '강의시 사용하기 편리하게 교안을 작성할 수 있다.',
+  '미리 강의 연습을 한다.',
+  '강의 연습을 할 때 녹음이나 비디오 촬영을 한다.',
+  '학습자의 질문을 예상하고 답변을 준비한다.',
+  '학습자의 주의를 집중시키며 강의를 시작할 수 있다.',
+  '강의시 몸이 굳어 있거나 강단에 기대지 않는다.',
+  '강의를 하면서 자연스러운 제스처를 쓴다.',
+  '학습자와 시선을 맞추려고 노력한다.',
+  '학습자들 앞에서 편안하게 말 할 수 있다.',
+  '강의시 목소리는 떨리거나 더듬지 않고 안정적이다.',
+  '상황에 따라 음성을 다양하게 구사할 수 있다.',
+  '강의하는 동안 학습자의 행동을 잘 조절할 수 있다.',
+  '학습자와의 상호작용을 쉽게 이끌어 낼 수 있다.',
+  '학습내용을 체계적으로 전달할 수 있다.',
+  '학습내용의 전달과 정리를 위해 시각자료를 이용한다.',
+  '시각자료는 단순하고 읽기 쉽게 효과적이다.',
+  '강의의 속도와 흐름을 조절할 수 있다.',
+  '정해진 강의 시간을 지킨다.',
+];
+
+// scores[i] = 1~5 or 'N' or null
+let scores = new Array(20).fill(null);
+
+// 오늘 날짜 표시
+function setToday() {
+  const d = new Date();
+  const s = `${d.getFullYear()}년 ${d.getMonth()+1}월 ${d.getDate()}일`;
+  document.getElementById('todayDate').textContent = s;
+}
+
+// 테이블 렌더
+function renderTable() {
+  const tbody = document.getElementById('checkBody');
+  let html = '';
+  ITEMS.forEach((text, i) => {
+    const val = scores[i];
+    const answered = val !== null;
+    html += `<tr id="row-${i}" class="${answered ? 'row-answered' : ''}">
+      <td class="num-cell">${i+1}</td>
+      <td class="content-cell">${text}</td>
+      <td style="text-align:center;padding:8px 10px">
+        <div class="score-group">
+          ${[5,4,3,2,1].map(n =>
+            `<button class="score-btn${val===n?' active-'+n:''}" onclick="setScore(${i},${n})">${n}</button>`
+          ).join('')}
+        </div>
+      </td>
+      <td style="text-align:center;padding:8px 10px">
+        <button class="na-btn${val==='N'?' active-na':''}" onclick="setScore(${i},'N')">해당없음</button>
+      </td>
+    </tr>`;
+  });
+  tbody.innerHTML = html;
+}
+
+function setScore(idx, val) {
+  // 같은 값 재클릭 시 해제
+  scores[idx] = scores[idx] === val ? null : val;
+  updateRow(idx);
+  updateSummary();
+}
+
+function updateRow(idx) {
+  const val = scores[idx];
+  const row = document.getElementById('row-'+idx);
+  row.className = val !== null ? 'row-answered' : '';
+  row.classList.remove('row-missing');
+
+  // 점수 버튼 갱신
+  [5,4,3,2,1].forEach(n => {
+    const btns = row.querySelectorAll('.score-btn');
+    btns.forEach((btn, bi) => {
+      const score = [5,4,3,2,1][bi];
+      btn.className = 'score-btn' + (val === score ? ' active-'+score : '');
+    });
+  });
+  const naBtn = row.querySelector('.na-btn');
+  if (naBtn) naBtn.className = 'na-btn' + (val === 'N' ? ' active-na' : '');
+}
+
+function calcScore() {
+  let total = 0;
+  let answered = 0;
+  let maxPossible = 0;
+  scores.forEach(v => {
+    if (v === null) return;
+    answered++;
+    if (v === 'N') return;
+    total += v;
+    maxPossible += 5;
+  });
+  return { total, answered, maxPossible };
+}
+
+function getGrade(score) {
+  if (score >= 85) return { text: '매우 훌륭함', cls: 'grade-5' };
+  if (score >= 70) return { text: '훌륭함', cls: 'grade-4' };
+  if (score >= 50) return { text: '보통임', cls: 'grade-3' };
+  if (score >= 30) return { text: '약함', cls: 'grade-2' };
+  return { text: '아주 약함', cls: 'grade-1' };
+}
+
+function updateSummary() {
+  const { total, answered } = calcScore();
+  document.getElementById('scoreNum').textContent = total;
+  document.getElementById('scoreMax').textContent = ' / 100점';
+  document.getElementById('progressLabel').textContent = `${answered} / 20개 응답완료`;
+  document.getElementById('progressBar').style.width = (answered / 20 * 100) + '%';
+
+  const grade = getGrade(total);
+  const gradeEl = document.getElementById('scoreGrade');
+  gradeEl.textContent = answered > 0 ? grade.text : '—';
+  gradeEl.className = 'score-grade ' + (answered > 0 ? grade.cls : 'grade-3');
+}
+
+function resetAll() {
+  if (!confirm('모든 응답을 초기화하시겠습니까?')) return;
+  scores = new Array(20).fill(null);
+  renderTable();
+  updateSummary();
+}
+
+// 토스트
+let toastTimer = null;
+function showToast(msg) {
+  const old = document.getElementById('toast');
+  if (old) old.remove();
+  if (toastTimer) clearTimeout(toastTimer);
+  const t = document.createElement('div');
+  t.id = 'toast'; t.className = 'toast';
+  t.innerHTML = '⚠️ ' + msg;
+  document.body.appendChild(t);
+  toastTimer = setTimeout(() => t.remove(), 3500);
+}
+
+// 결과 제출
+function openResult() {
+  // 미응답 체크
+  const unanswered = scores.map((v,i) => ({v,i})).filter(x => x.v === null);
+  document.querySelectorAll('tr.row-missing').forEach(r => r.classList.remove('row-missing'));
+
+  if (unanswered.length > 0) {
+    unanswered.forEach(x => {
+      const row = document.getElementById('row-'+x.i);
+      if (row) row.classList.add('row-missing');
+    });
+    const firstRow = document.getElementById('row-'+unanswered[0].i);
+    if (firstRow) firstRow.scrollIntoView({behavior:'smooth', block:'center'});
+    showToast(`미응답 항목이 ${unanswered.length}개 있습니다. (연번 ${unanswered.map(x=>x.i+1).join(', ')})`);
+    return;
+  }
+
+  const name = document.getElementById('nameInput').value.trim();
+  const dept = document.getElementById('deptInput').value.trim();
+  const topic = document.getElementById('topicInput').value.trim();
+  const dateText = document.getElementById('todayDate').textContent;
+  const { total } = calcScore();
+  const grade = getGrade(total);
+
+  let html = `
+    <div class="result-info-grid">
+      <div class="result-info-item"><div class="result-info-label">강사 이름</div><div class="result-info-value">${name || '(미입력)'}</div></div>
+      <div class="result-info-item"><div class="result-info-label">소속</div><div class="result-info-value">${dept || '(미입력)'}</div></div>
+      <div class="result-info-item"><div class="result-info-label">날짜</div><div class="result-info-value">${dateText}</div></div>
+      <div class="result-info-item"><div class="result-info-label">장소</div><div class="result-info-value">샤인센터</div></div>
+      <div class="result-info-item full"><div class="result-info-label">강의 주제</div><div class="result-info-value">${topic || '(미입력)'}</div></div>
+    </div>
+    <div class="result-score-box">
+      <span class="result-score-num">${total}</span>
+      <div class="result-score-detail">
+        <span class="result-score-max">/ 100점 만점</span>
+        <span class="result-grade-badge ${grade.cls}">${grade.text}</span>
+      </div>
+    </div>
+    <div style="font-size:12px;color:var(--text-secondary);background:var(--surface2);padding:10px 14px;border-radius:8px;line-height:1.8">
+      <strong>등급 기준</strong><br>
+      85점 이상: 매우 훌륭함 &nbsp;|&nbsp; 70점 이상: 훌륭함 &nbsp;|&nbsp; 50점 이상: 보통임<br>
+      30점 이상: 약함 &nbsp;|&nbsp; 30점 미만: 아주 약함
+    </div>`;
+
+  document.getElementById('resultBody').innerHTML = html;
+  document.getElementById('resultModal').classList.remove('hidden');
+}
+
+function closeResult() { document.getElementById('resultModal').classList.add('hidden'); }
+function closeResultOnOverlay(e) { if (e.target === document.getElementById('resultModal')) closeResult(); }
+
+// INIT
+setToday();
+renderTable();
+updateSummary();
+</script>
+</body>
+</html>
