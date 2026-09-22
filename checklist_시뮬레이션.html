@@ -533,10 +533,14 @@ function openResult(){
   const t1y=countDual('t1','Y'), t1n=countDual('t1','N'), t1d=countDual('t1','D');
   const t2y=countDual('t2','Y'), t2n=countDual('t2','N'), t2d=countDual('t2','D');
 
-  // 평균: Y/N/D 각각 두 조의 평균 (소수점 첫째 자리)
+  // 평균: Y/N/D 각각 두 조의 평균 (소수점 첫째 자리까지 표시)
   const avgY = ((t1y+t2y)/2).toFixed(1);
   const avgN = ((t1n+t2n)/2).toFixed(1);
   const avgD = ((t1d+t2d)/2).toFixed(1);
+
+  // 구글시트에 저장할 최종 평균: 소수점 첫째 자리에서 반올림한 정수
+  const finalAvgY = Math.round((t1y+t2y)/2);
+  const finalAvgN = Math.round((t1n+t2n)/2);
 
   let html='<div class="result-info">';
   if(instructor) html+=`<strong>🎓 강사</strong>&nbsp;&nbsp;${instructor.replace(/</g,'&lt;')}<br>`;
@@ -566,12 +570,12 @@ function openResult(){
   // 구분선
   html+=`<div style="border-top:2px solid var(--border-strong);margin:4px 0"></div>`;
 
-  // 두 조 평균
+  // 두 조 평균 (Y/N은 구글시트에 저장되는 반올림 값과 동일하게 표시, D는 참고용 평균)
   html+=`<div class="result-section">
-    <div class="result-section-label" style="color:var(--text-primary);font-size:13px">📊 최종 평균 (1조 + 2조)</div>
+    <div class="result-section-label" style="color:var(--text-primary);font-size:13px">📊 최종 평균 (1조 + 2조, 반올림)</div>
     <div class="result-row"><div class="result-pills">
-      <span class="rp rp-y">Y ${avgY}</span>
-      <span class="rp rp-n">N ${avgN}</span>
+      <span class="rp rp-y">Y ${finalAvgY}</span>
+      <span class="rp rp-n">N ${finalAvgN}</span>
       <span class="rp rp-d">D ${avgD}</span>
     </div></div>
   </div>`;
@@ -582,33 +586,24 @@ function openResult(){
   document.getElementById('resultBody').innerHTML=html;
   document.getElementById('resultModal').classList.remove('hidden');
 
-  // 1조·2조 각각 별도 행으로 저장 (체크리스트명으로 구분)
-  submitBoth({ instructor, team, t1y, t1n, t2y, t2n });
+  // 1조·2조를 합친 최종 평균(반올림한 정수) 한 행으로 저장
+  submitToServer({ instructor, team, y: finalAvgY, n: finalAvgN });
 }
 
-function submitBoth(payload) {
+function submitToServer(payload) {
   const statusEl = () => document.getElementById('saveStatus');
-  let done = 0, failed = false;
-  function check() {
-    done++;
-    if (done >= 2 && statusEl()) {
-      if (failed) {
-        statusEl().className = 'result-status failed';
-        statusEl().textContent = '⚠️ 일부 저장 실패 (기기에 임시 백업됨)';
-      } else {
-        statusEl().className = 'result-status saved';
-        statusEl().textContent = '✅ 저장 완료 (1조·2조 모두)';
-      }
-    }
-  }
-  submitToServer('시뮬레이션(1조)', { instructor: payload.instructor, team: payload.team, y: payload.t1y, n: payload.t1n }, check, () => failed = true);
-  submitToServer('시뮬레이션(2조)', { instructor: payload.instructor, team: payload.team, y: payload.t2y, n: payload.t2n }, check, () => failed = true);
-}
 
-function submitToServer(checklistName, payload, onDone, onFail) {
-  if (!SUBMIT_URL || SUBMIT_URL.indexOf('http') !== 0) { if (onFail) onFail(); if (onDone) onDone(); return; }
-  const body = JSON.stringify({ checklist: checklistName, ...payload });
+  if (!SUBMIT_URL || SUBMIT_URL.indexOf('http') !== 0) {
+    if (statusEl()) {
+      statusEl().className = 'result-status failed';
+      statusEl().textContent = '⚠️ 저장 서버가 설정되지 않았습니다 (SUBMIT_URL 확인 필요)';
+    }
+    return;
+  }
+
+  const body = JSON.stringify({ checklist: CHECKLIST_NAME, ...payload });
   saveLocalBackup(body);
+
   fetch(SUBMIT_URL, {
     method: 'POST',
     // Apps Script 응답은 CORS 헤더가 없는 경우가 많아 응답 내용은 읽지 않고,
@@ -618,10 +613,18 @@ function submitToServer(checklistName, payload, onDone, onFail) {
     body: body
   })
   .then(() => {
+    if (statusEl()) {
+      statusEl().className = 'result-status saved';
+      statusEl().textContent = '✅ 저장 완료';
+    }
     clearLocalBackup(body);
-    if (onDone) onDone();
   })
-  .catch(() => { if (onFail) onFail(); if (onDone) onDone(); });
+  .catch(() => {
+    if (statusEl()) {
+      statusEl().className = 'result-status failed';
+      statusEl().textContent = '⚠️ 네트워크 오류로 저장 실패 (기기에 임시 백업됨)';
+    }
+  });
 }
 
 const BACKUP_KEY = 'nursing_checklist_pending_submissions';
