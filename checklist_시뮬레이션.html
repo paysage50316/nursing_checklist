@@ -135,6 +135,10 @@
   .rp-d{background:var(--d-bg);color:var(--d-color);border:1.5px solid var(--d-border);}
   .result-memo{padding:10px 14px;background:var(--surface2);border-left:3px solid var(--accent);border-radius:0 6px 6px 0;font-size:12px;color:var(--text-secondary);line-height:1.6;white-space:pre-wrap;}
   .result-memo-label{font-size:11px;font-weight:700;color:var(--accent);margin-bottom:4px;display:block;}
+  .result-status{font-size:12px;padding:8px 12px;border-radius:8px;display:flex;align-items:center;gap:6px;margin-top:6px;}
+  .result-status.saving{background:#eff6ff;color:#1d4ed8;}
+  .result-status.saved{background:#dcfce7;color:#16a34a;}
+  .result-status.failed{background:#fee2e2;color:#dc2626;}
 
   .toast{position:fixed;bottom:32px;left:50%;transform:translateX(-50%);background:#1e293b;color:#fff;padding:12px 22px;border-radius:10px;font-size:13px;font-weight:600;box-shadow:0 8px 24px rgba(0,0,0,0.25);z-index:2000;display:flex;align-items:center;gap:8px;animation:slideUp 0.25s ease;}
   @keyframes slideUp{from{opacity:0;transform:translateX(-50%) translateY(16px);}to{opacity:1;transform:translateX(-50%) translateY(0);}}
@@ -262,6 +266,12 @@
 </div>
 
 <script>
+// ============================================================
+// ⚠️ 여기에 Google Apps Script 웹 앱 배포 URL을 붙여넣으세요.
+const SUBMIT_URL = 'https://script.google.com/macros/s/AKfycbzpjDYj4ihCgQin5eYIMih8d_nRJgs_2HLXoH7tvaHmPnOk7Ww_EbrXJch79YIJSRSS/exec';
+const CHECKLIST_NAME = '시뮬레이션';
+// ============================================================
+
 // ── 데이터 정의 ───────────────────────────────────────────
 // type: 'common' = 단일 체크 / 'dual' = 1조·2조 각각 체크
 const ITEMS = [
@@ -568,8 +578,82 @@ function openResult(){
 
   if(memo) html+=`<div class="result-memo"><span class="result-memo-label">📝 메모</span>${memo.replace(/</g,'&lt;').replace(/>/g,'&gt;')}</div>`;
 
+  html += '<div class="result-status saving" id="saveStatus">⏳ 저장 중...</div>';
   document.getElementById('resultBody').innerHTML=html;
   document.getElementById('resultModal').classList.remove('hidden');
+
+  // 1조·2조 각각 별도 행으로 저장 (체크리스트명으로 구분)
+  submitBoth({ instructor, team, t1y, t1n, t2y, t2n });
+}
+
+function submitBoth(payload) {
+  const statusEl = () => document.getElementById('saveStatus');
+  let done = 0, failed = false;
+  function check() {
+    done++;
+    if (done >= 2 && statusEl()) {
+      if (failed) {
+        statusEl().className = 'result-status failed';
+        statusEl().textContent = '⚠️ 일부 저장 실패 (기기에 임시 백업됨)';
+      } else {
+        statusEl().className = 'result-status saved';
+        statusEl().textContent = '✅ 저장 완료 (1조·2조 모두)';
+      }
+    }
+  }
+  submitToServer('시뮬레이션(1조)', { instructor: payload.instructor, team: payload.team, y: payload.t1y, n: payload.t1n }, check, () => failed = true);
+  submitToServer('시뮬레이션(2조)', { instructor: payload.instructor, team: payload.team, y: payload.t2y, n: payload.t2n }, check, () => failed = true);
+}
+
+function submitToServer(checklistName, payload, onDone, onFail) {
+  if (!SUBMIT_URL || SUBMIT_URL.indexOf('http') !== 0) { if (onFail) onFail(); if (onDone) onDone(); return; }
+  const body = JSON.stringify({ checklist: checklistName, ...payload });
+  saveLocalBackup(body);
+  fetch(SUBMIT_URL, {
+    method: 'POST',
+    headers: { 'Content-Type': 'text/plain;charset=utf-8' },
+    body: body
+  })
+  .then(res => res.json())
+  .then(data => {
+    if (data && data.status === 'ok') { clearLocalBackup(body); } else { if (onFail) onFail(); }
+    if (onDone) onDone();
+  })
+  .catch(() => { if (onFail) onFail(); if (onDone) onDone(); });
+}
+
+const BACKUP_KEY = 'nursing_checklist_pending_submissions';
+
+function saveLocalBackup(bodyStr) {
+  try {
+    const list = JSON.parse(localStorage.getItem(BACKUP_KEY) || '[]');
+    list.push({ ts: Date.now(), body: bodyStr });
+    localStorage.setItem(BACKUP_KEY, JSON.stringify(list));
+  } catch (e) { /* ignore */ }
+}
+
+function clearLocalBackup(bodyStr) {
+  try {
+    const list = JSON.parse(localStorage.getItem(BACKUP_KEY) || '[]');
+    const filtered = list.filter(item => item.body !== bodyStr);
+    localStorage.setItem(BACKUP_KEY, JSON.stringify(filtered));
+  } catch (e) { /* ignore */ }
+}
+
+function retryPendingSubmissions() {
+  if (!SUBMIT_URL || SUBMIT_URL.indexOf('http') !== 0) return;
+  try {
+    const list = JSON.parse(localStorage.getItem(BACKUP_KEY) || '[]');
+    list.forEach(item => {
+      fetch(SUBMIT_URL, {
+        method: 'POST',
+        headers: { 'Content-Type': 'text/plain;charset=utf-8' },
+        body: item.body
+      }).then(res => res.json()).then(data => {
+        if (data && data.status === 'ok') clearLocalBackup(item.body);
+      }).catch(() => {});
+    });
+  } catch (e) { /* ignore */ }
 }
 
 function closeResult(){document.getElementById('resultModal').classList.add('hidden');}
@@ -577,6 +661,7 @@ function closeResultOnOverlay(e){if(e.target===document.getElementById('resultMo
 
 renderTable();
 updateTotals();
+retryPendingSubmissions();
 </script>
 </body>
 </html>
