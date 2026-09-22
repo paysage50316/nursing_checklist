@@ -427,9 +427,7 @@ function openResult() {
   document.getElementById('resultBody').innerHTML = html;
   document.getElementById('resultModal').classList.remove('hidden');
 
-  submitToServer({ instructor, team, memo, items: ITEMS.map(it => ({
-    num: it.num, sec: it.sec, text: it.text, ...getCell(it.num)
-  })) });
+  submitToServer({ instructor, team, y, n });
 }
 
 function submitToServer(payload) {
@@ -520,4 +518,3 @@ retryPendingSubmissions();
 </script>
 </body>
 </html>
-
