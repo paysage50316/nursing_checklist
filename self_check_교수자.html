@@ -414,6 +414,10 @@
     .score-group { gap: 3px; }
     .score-btn { width: 32px; height: 30px; font-size: 12px; }
   }
+  .result-status { font-size: 12px; padding: 8px 12px; border-radius: 8px; display: flex; align-items: center; gap: 6px; margin-top: 10px; }
+  .result-status.saving { background: #eff6ff; color: #1d4ed8; }
+  .result-status.saved { background: #dcfce7; color: #16a34a; }
+  .result-status.failed { background: #fee2e2; color: #dc2626; }
 </style>
 </head>
 <body>
@@ -539,6 +543,11 @@
 </div>
 
 <script>
+// ============================================================
+// ⚠️ 여기에 Google Apps Script 웹 앱 배포 URL을 붙여넣으세요.
+const SUBMIT_URL = 'https://script.google.com/macros/s/AKfycbzpjDYj4ihCgQin5eYIMih8d_nRJgs_2HLXoH7tvaHmPnOk7Ww_EbrXJch79YIJSRSS/exec';
+// ============================================================
+
 const ITEMS = [
   '강의하기 전에 미리 학습자에 대해 조사한다.',
   '강의를 위해 교안을 작성한다.',
@@ -722,8 +731,78 @@ function openResult() {
       30점 이상: 약함 &nbsp;|&nbsp; 30점 미만: 아주 약함
     </div>`;
 
+  html += '<div class="result-status saving" id="saveStatus">⏳ 저장 중...</div>';
   document.getElementById('resultBody').innerHTML = html;
   document.getElementById('resultModal').classList.remove('hidden');
+
+  submitToServer({ name, dept, topic, date: dateText, total, grade: grade.text });
+}
+
+function submitToServer(payload) {
+  const statusEl = () => document.getElementById('saveStatus');
+  if (!SUBMIT_URL || SUBMIT_URL.indexOf('http') !== 0) {
+    if (statusEl()) {
+      statusEl().className = 'result-status failed';
+      statusEl().textContent = '⚠️ 저장 서버가 설정되지 않았습니다 (SUBMIT_URL 확인 필요)';
+    }
+    return;
+  }
+  const body = JSON.stringify({ type: 'selfcheck', ...payload });
+  saveLocalBackup(body);
+  fetch(SUBMIT_URL, {
+    method: 'POST',
+    // Apps Script 응답은 CORS 헤더가 없는 경우가 많아 응답 내용은 읽지 않고(no-cors),
+    // 요청 전송 자체가 성공했는지로만 판단한다. (실제 저장은 서버에서 이미 완료된 상태)
+    mode: 'no-cors',
+    headers: { 'Content-Type': 'text/plain;charset=utf-8' },
+    body: body
+  })
+  .then(() => {
+    if (statusEl()) {
+      statusEl().className = 'result-status saved';
+      statusEl().textContent = '✅ 저장 완료';
+    }
+    clearLocalBackup(body);
+  })
+  .catch(() => {
+    if (statusEl()) {
+      statusEl().className = 'result-status failed';
+      statusEl().textContent = '⚠️ 네트워크 오류로 저장 실패 (기기에 임시 백업됨)';
+    }
+  });
+}
+
+const BACKUP_KEY = 'nursing_checklist_pending_submissions';
+
+function saveLocalBackup(bodyStr) {
+  try {
+    const list = JSON.parse(localStorage.getItem(BACKUP_KEY) || '[]');
+    list.push({ ts: Date.now(), body: bodyStr });
+    localStorage.setItem(BACKUP_KEY, JSON.stringify(list));
+  } catch (e) { /* ignore */ }
+}
+
+function clearLocalBackup(bodyStr) {
+  try {
+    const list = JSON.parse(localStorage.getItem(BACKUP_KEY) || '[]');
+    const filtered = list.filter(item => item.body !== bodyStr);
+    localStorage.setItem(BACKUP_KEY, JSON.stringify(filtered));
+  } catch (e) { /* ignore */ }
+}
+
+function retryPendingSubmissions() {
+  if (!SUBMIT_URL || SUBMIT_URL.indexOf('http') !== 0) return;
+  try {
+    const list = JSON.parse(localStorage.getItem(BACKUP_KEY) || '[]');
+    list.forEach(item => {
+      fetch(SUBMIT_URL, {
+        method: 'POST',
+        mode: 'no-cors',
+        headers: { 'Content-Type': 'text/plain;charset=utf-8' },
+        body: item.body
+      }).then(() => clearLocalBackup(item.body)).catch(() => {});
+    });
+  } catch (e) { /* ignore */ }
 }
 
 function closeResult() { document.getElementById('resultModal').classList.add('hidden'); }
@@ -733,6 +812,7 @@ function closeResultOnOverlay(e) { if (e.target === document.getElementById('res
 setToday();
 renderTable();
 updateSummary();
+retryPendingSubmissions();
 </script>
 </body>
 </html>
