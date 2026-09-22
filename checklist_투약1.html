@@ -52,6 +52,7 @@
 
   .submit-btn { width: 100%; padding: 11px; border: none; border-radius: 8px; background: var(--accent); color: #fff; font-family: inherit; font-size: 13px; font-weight: 700; cursor: pointer; display: flex; align-items: center; justify-content: center; gap: 6px; transition: background 0.15s; margin-top: 10px; }
   .submit-btn:hover { background: #162d4a; }
+  .submit-btn:disabled { opacity: 0.6; cursor: not-allowed; }
 
   .content-area { display: flex; flex-direction: column; gap: 20px; }
 
@@ -117,6 +118,10 @@
   .rp-d { background: var(--d-bg); color: var(--d-color); border: 1.5px solid var(--d-border); }
   .result-memo { padding: 10px 14px; background: var(--surface2); border-left: 3px solid var(--accent); border-radius: 0 6px 6px 0; font-size: 12px; color: var(--text-secondary); line-height: 1.6; white-space: pre-wrap; }
   .result-memo-label { font-size: 11px; font-weight: 700; color: var(--accent); margin-bottom: 4px; display: block; }
+  .result-status { font-size: 12px; padding: 8px 12px; border-radius: 8px; display: flex; align-items: center; gap: 6px; }
+  .result-status.saving { background: #eff6ff; color: #1d4ed8; }
+  .result-status.saved { background: var(--y-bg); color: var(--y-color); }
+  .result-status.failed { background: var(--n-bg); color: var(--n-color); }
 
   .hidden { display: none !important; }
 
@@ -163,7 +168,7 @@
         <span class="team-label" style="margin-top:10px">교육생 이름 (최대 40자, 여러 명 가능)</span>
         <textarea class="team-input" id="teamInput" maxlength="40" placeholder="예) 김지수, 이민준, 박서연" oninput="onTeamInput()"></textarea>
         <div class="char-count" id="charCount">0 / 40</div>
-        <button class="submit-btn" onclick="openResult()">📋 결과 제출</button>
+        <button class="submit-btn" id="submitBtn" onclick="openResult()">📋 결과 제출</button>
       </div>
     </div>
 
@@ -246,6 +251,13 @@
 </div>
 
 <script>
+// ============================================================
+// ⚠️ 여기에 Google Apps Script 웹 앱 배포 URL을 붙여넣으세요.
+// (Apps Script 편집기 > 배포 > 새 배포 > 웹 앱 배포 후 생성되는 URL)
+const SUBMIT_URL = 'https://script.google.com/macros/s/AKfycbzpjDYj4ihCgQin5eYIMih8d_nRJgs_2HLXoH7tvaHmPnOk7Ww_EbrXJch79YIJSRSS/exec';
+const CHECKLIST_NAME = '투약1';
+// ============================================================
+
 const ITEMS = [
   {num:1,  sec:'상황① Nexium', scBg:'#e0f2fe', scTx:'#0369a1', text:'투약 카드의 5right를 확인하고 투약 준비를 한다. (Nexium + N/S 50cc dilution)'},
   {num:2,  sec:null, text:'첫만남 자기소개를 한다.'},
@@ -298,7 +310,6 @@ function toggle(num, val) {
     const b = document.getElementById('btn-'+num+'-'+v);
     if (b) b.className = 'check-btn' + (c[v]?' active-'+v.toLowerCase():'');
   });
-  // 체크 시 미체크 강조 해제
   const anyChecked = c.Y || c.N || c.D;
   const btn = document.getElementById('btn-'+num+'-Y');
   if (btn) {
@@ -374,22 +385,18 @@ function showToast(msg) {
 }
 
 function openResult() {
-  // 미체크 항목 찾기 (sec-header 행 제외, 실제 데이터 행만)
   const unchecked = ITEMS.filter(item => {
     const c = checks[item.num];
     return !c || (!c.Y && !c.N && !c.D);
   });
 
-  // 기존 강조 초기화
   document.querySelectorAll('tr.row-missing').forEach(r => r.classList.remove('row-missing'));
 
   if (unchecked.length > 0) {
-    // 미체크 행 강조
     unchecked.forEach(item => {
       const btns = document.getElementById('btn-'+item.num+'-Y');
       if (btns) btns.closest('tr').classList.add('row-missing');
     });
-    // 첫 번째 미체크 항목으로 스크롤
     const firstBtn = document.getElementById('btn-'+unchecked[0].num+'-Y');
     if (firstBtn) firstBtn.closest('tr').scrollIntoView({behavior:'smooth', block:'center'});
     showToast(`미체크 항목이 ${unchecked.length}개 있습니다. (연번 ${unchecked.map(i=>i.num).join(', ')})`);
@@ -416,14 +423,101 @@ function openResult() {
     +'<span class="rp rp-d">D '+d+'</span>'
     +'</div></div>';
   if (memo) html += '<div class="result-memo"><span class="result-memo-label">📝 메모</span>'+memo.replace(/</g,'&lt;').replace(/>/g,'&gt;')+'</div>';
+  html += '<div class="result-status saving" id="saveStatus">⏳ 저장 중...</div>';
   document.getElementById('resultBody').innerHTML = html;
   document.getElementById('resultModal').classList.remove('hidden');
+
+  submitToServer({ instructor, team, memo, items: ITEMS.map(it => ({
+    num: it.num, sec: it.sec, text: it.text, ...getCell(it.num)
+  })) });
+}
+
+function submitToServer(payload) {
+  const statusEl = () => document.getElementById('saveStatus');
+
+  if (!SUBMIT_URL || SUBMIT_URL.indexOf('http') !== 0) {
+    if (statusEl()) {
+      statusEl().className = 'result-status failed';
+      statusEl().textContent = '⚠️ 저장 서버가 설정되지 않았습니다 (SUBMIT_URL 확인 필요)';
+    }
+    return;
+  }
+
+  const body = JSON.stringify({ checklist: CHECKLIST_NAME, ...payload });
+
+  // 서버 오프라인 등으로 실패할 경우를 대비해 로컬(localStorage)에도 백업
+  saveLocalBackup(body);
+
+  fetch(SUBMIT_URL, {
+    method: 'POST',
+    // Apps Script 웹 앱은 커스텀 헤더가 있으면 CORS 프리플라이트에서 막히므로
+    // Content-Type을 text/plain으로 보내고 Apps Script 쪽에서 JSON.parse 한다.
+    headers: { 'Content-Type': 'text/plain;charset=utf-8' },
+    body: body
+  })
+  .then(res => res.json())
+  .then(data => {
+    if (statusEl()) {
+      if (data && data.status === 'ok') {
+        statusEl().className = 'result-status saved';
+        statusEl().textContent = '✅ 저장 완료';
+        clearLocalBackup(body);
+      } else {
+        statusEl().className = 'result-status failed';
+        statusEl().textContent = '⚠️ 저장 실패 (기기에 임시 백업됨, 나중에 재전송 가능)';
+      }
+    }
+  })
+  .catch(() => {
+    if (statusEl()) {
+      statusEl().className = 'result-status failed';
+      statusEl().textContent = '⚠️ 네트워크 오류로 저장 실패 (기기에 임시 백업됨)';
+    }
+  });
+}
+
+// ----- 네트워크 문제 등에 대비한 로컬 백업(재전송용) -----
+const BACKUP_KEY = 'nursing_checklist_pending_submissions';
+
+function saveLocalBackup(bodyStr) {
+  try {
+    const list = JSON.parse(localStorage.getItem(BACKUP_KEY) || '[]');
+    list.push({ ts: Date.now(), body: bodyStr });
+    localStorage.setItem(BACKUP_KEY, JSON.stringify(list));
+  } catch (e) { /* localStorage 사용 불가 환경이면 무시 */ }
+}
+
+function clearLocalBackup(bodyStr) {
+  try {
+    const list = JSON.parse(localStorage.getItem(BACKUP_KEY) || '[]');
+    const filtered = list.filter(item => item.body !== bodyStr);
+    localStorage.setItem(BACKUP_KEY, JSON.stringify(filtered));
+  } catch (e) { /* ignore */ }
+}
+
+// 페이지를 열 때 이전에 저장 실패했던 항목이 있으면 재전송 시도
+function retryPendingSubmissions() {
+  if (!SUBMIT_URL || SUBMIT_URL.indexOf('http') !== 0) return;
+  try {
+    const list = JSON.parse(localStorage.getItem(BACKUP_KEY) || '[]');
+    list.forEach(item => {
+      fetch(SUBMIT_URL, {
+        method: 'POST',
+        headers: { 'Content-Type': 'text/plain;charset=utf-8' },
+        body: item.body
+      }).then(res => res.json()).then(data => {
+        if (data && data.status === 'ok') clearLocalBackup(item.body);
+      }).catch(() => {});
+    });
+  } catch (e) { /* ignore */ }
 }
 
 function closeResult() { document.getElementById('resultModal').classList.add('hidden'); }
 function closeResultOnOverlay(e) { if(e.target===document.getElementById('resultModal')) closeResult(); }
 
 renderTable();
+retryPendingSubmissions();
 </script>
 </body>
 </html>
+
