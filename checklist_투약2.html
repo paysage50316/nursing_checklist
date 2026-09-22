@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>투약1 시뮬레이션 교육 체크리스트</title>
+<title>투약2 시뮬레이션 교육 체크리스트</title>
 <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+KR:wght@300;400;500;600;700&family=JetBrains+Mono:wght@400;600&display=swap" rel="stylesheet">
 <style>
   :root {
@@ -52,7 +52,6 @@
 
   .submit-btn { width: 100%; padding: 11px; border: none; border-radius: 8px; background: var(--accent); color: #fff; font-family: inherit; font-size: 13px; font-weight: 700; cursor: pointer; display: flex; align-items: center; justify-content: center; gap: 6px; transition: background 0.15s; margin-top: 10px; }
   .submit-btn:hover { background: #162d4a; }
-  .submit-btn:disabled { opacity: 0.6; cursor: not-allowed; }
 
   .content-area { display: flex; flex-direction: column; gap: 20px; }
 
@@ -150,7 +149,7 @@
 <header class="site-header">
   <div class="logo">🏥</div>
   <div>
-    <h1>투약1 시뮬레이션 교육 체크리스트</h1>
+    <h1>투약2 시뮬레이션 교육 체크리스트</h1>
     <p>간호부문 공통 신입간호사 스타트(입문)교육</p>
   </div>
   <span class="header-badge">Y · N · D</span>
@@ -168,16 +167,17 @@
         <span class="team-label" style="margin-top:10px">교육생 이름 (최대 40자, 여러 명 가능)</span>
         <textarea class="team-input" id="teamInput" maxlength="40" placeholder="예) 김지수, 이민준, 박서연" oninput="onTeamInput()"></textarea>
         <div class="char-count" id="charCount">0 / 40</div>
-        <button class="submit-btn" id="submitBtn" onclick="openResult()">📋 결과 제출</button>
+        <button class="submit-btn" onclick="openResult()">📋 결과 제출</button>
       </div>
     </div>
 
     <div class="card">
       <div class="card-header">📋 섹션 이동</div>
       <div class="nav-tabs">
-        <button class="nav-tab active" onclick="goToSection('checklist-card',this)">① Nexium</button>
-        <button class="nav-tab" onclick="goToSection('sec-s2',this)">② Ambroxol</button>
-        <button class="nav-tab" onclick="goToSection('sec-s3',this)">③ Cefazolin</button>
+        <button class="nav-tab active" onclick="goToSection('checklist-card',this)">🔵 모든 상황</button>
+        <button class="nav-tab" onclick="goToSection('sec-s1',this)">① SC 투약 (Apidra)</button>
+        <button class="nav-tab" onclick="goToSection('sec-s2',this)">② PO 투약 (AAP)</button>
+        <button class="nav-tab" onclick="goToSection('sec-s3',this)">③ PRN IM (Ketoprofen)</button>
         <button class="nav-tab" onclick="goToSection('memo-section',this)">📝 메모</button>
       </div>
     </div>
@@ -212,7 +212,7 @@
 
     <div class="checklist-card" id="checklist-card">
       <div class="checklist-header">
-        <span class="checklist-title">📋 체크리스트 (총 27개)</span>
+        <span class="checklist-title">📋 체크리스트 (총 20개)</span>
         <button class="reset-all-btn" onclick="resetAll()">전체 초기화</button>
       </div>
       <div class="table-wrapper">
@@ -243,7 +243,7 @@
   <div class="modal-box">
     <div class="modal-header">
       <span style="font-size:20px">📋</span>
-      <h2>투약1 체크리스트 결과&nbsp;<span id="resultDate" style="font-size:13px;font-weight:500;color:var(--text-secondary)"></span></h2>
+      <h2>투약2 체크리스트 결과&nbsp;<span id="resultDate" style="font-size:13px;font-weight:500;color:var(--text-secondary)"></span></h2>
       <button class="modal-close" onclick="closeResult()">✕</button>
     </div>
     <div class="modal-body" id="resultBody"></div>
@@ -253,42 +253,34 @@
 <script>
 // ============================================================
 // ⚠️ 여기에 Google Apps Script 웹 앱 배포 URL을 붙여넣으세요.
-// (Apps Script 편집기 > 배포 > 새 배포 > 웹 앱 배포 후 생성되는 URL)
 const SUBMIT_URL = 'https://script.google.com/macros/s/AKfycbzpjDYj4ihCgQin5eYIMih8d_nRJgs_2HLXoH7tvaHmPnOk7Ww_EbrXJch79YIJSRSS/exec';
-const CHECKLIST_NAME = '투약1';
+const CHECKLIST_NAME = '투약2';
 // ============================================================
 
 const ITEMS = [
-  {num:1,  sec:'상황① Nexium', scBg:'#e0f2fe', scTx:'#0369a1', text:'투약 카드의 5right를 확인하고 투약 준비를 한다. (Nexium + N/S 50cc dilution)'},
-  {num:2,  sec:null, text:'첫만남 자기소개를 한다.'},
-  {num:3,  sec:null, text:'손위생을 수행한다.'},
-  {num:4,  sec:null, text:'개방형으로 환자 확인을 한다.'},
-  {num:5,  sec:null, text:'IV site 개방성을 확인한다.'},
-  {num:6,  sec:null, text:'IV site를 소독하고 투약한다.'},
-  {num:7,  sec:null, text:'투약의 목적, 부작용 등을 설명한다.'},
-  {num:8,  sec:null, text:'투약 후 환자 상태를 확인하고 기록한다.'},
-  {num:9,  sec:null, text:'투약 카드의 5right를 확인하고 설명한다.'},
-  {num:10, sec:'상황② Ambroxol', scBg:'#dcfce7', scTx:'#16a34a', text:'투약 카드의 5right를 확인하고 투약 준비를 한다. (Ambroxol 1@)'},
-  {num:11, sec:null, text:'첫만남 자기소개를 한다.'},
-  {num:12, sec:null, text:'손위생을 수행한다.'},
-  {num:13, sec:null, text:'개방형으로 환자 확인을 한다.'},
-  {num:14, sec:null, text:'IV site 개방성을 확인한다.'},
-  {num:15, sec:null, text:'IV site를 소독하고 투약한다.'},
-  {num:16, sec:null, text:'투약의 목적, 부작용 등을 설명한다.'},
-  {num:17, sec:null, text:'투약 후 환자 상태를 확인하고 기록한다.'},
-  {num:18, sec:null, text:'투약 오더의 5right를 확인하고 설명한다.'},
-  {num:19, sec:'상황③ Cefazolin', scBg:'#cffafe', scTx:'#0e7490', text:'투약 카드의 5right를 확인하고 투약 준비를 한다. (Cefazolin 1g)'},
-  {num:20, sec:null, text:'첫만남 자기소개를 한다.'},
-  {num:21, sec:null, text:'손위생을 수행한다.'},
-  {num:22, sec:null, text:'개방형으로 환자 확인을 한다.'},
-  {num:23, sec:null, text:'IV site 개방성을 확인한다.'},
-  {num:24, sec:null, text:'IV site를 소독하고 투약한다.'},
-  {num:25, sec:null, text:'투약의 목적, 부작용 등을 설명한다.'},
-  {num:26, sec:null, text:'투약 후 환자 상태를 확인하고 기록한다.'},
-  {num:27, sec:null, text:'생소한 약물의 약품정보를 확인하는 방법을 알고 있다. (약품정보조회, 동료간호사 확인, 의약정보 파트 등)'},
+  {num:1,  sec:'모든 상황', scBg:'#e0f2fe', scTx:'#0369a1', text:'첫만남 자기소개를 한다.'},
+  {num:2,  sec:null, text:'손위생을 수행한다.'},
+  {num:3,  sec:null, text:'개방형으로 환자 확인을 한다.'},
+  {num:4,  sec:null, text:'환자의 말을 경청하고 공감을 표현한다.'},
+  {num:5,  sec:'상황① MD apidra SC 투약', scBg:'#dcfce7', scTx:'#16a34a', text:'5Rights를 준수하여 투약 오더를 확인하고, 준비한다.'},
+  {num:6,  sec:null, text:'투약 시 약물의 주의사항 및 부작용에 대한 내용을 확인한다.'},
+  {num:7,  sec:null, text:'투약 시 약물의 주의사항 및 부작용에 대한 내용을 환자가 이해하기 쉬운 언어를 사용하여 설명한다.'},
+  {num:8,  sec:null, text:'5Rights를 준수하여 투약한다.'},
+  {num:9,  sec:null, text:'투약 후 수행 서명을 한다.'},
+  {num:10, sec:'상황② 1P AAP PO 투약', scBg:'#cffafe', scTx:'#0e7490', text:'5Rights를 준수하여 투약 오더를 확인하고, 준비한다.'},
+  {num:11, sec:null, text:'투약 시 약물에 대한 설명을 한다.'},
+  {num:12, sec:null, text:'5Rights를 준수하여 투약한다.'},
+  {num:13, sec:null, text:'투약 후 수행 서명을 한다.'},
+  {num:14, sec:'상황③ 3P Ketoprofen PRN IM 투약', scBg:'#fce7f3', scTx:'#9d174d', text:'통증 사정의 요소들을 확인한다. (부위, 강도, 양상, 빈도, 기간)'},
+  {num:15, sec:null, text:'PRN 오더를 이해한다. (투약 사유, 간격, 1일 최대 허용 횟수 등)'},
+  {num:16, sec:null, text:'5Rights를 준수하여 투약 오더를 확인하고, 준비한다.'},
+  {num:17, sec:null, text:'5Rights를 준수하여 투약한다.'},
+  {num:18, sec:null, text:'투약 후 수행 서명을 한다.'},
+  {num:19, sec:null, text:'PRN 투약에 대한 기록을 한다. (구두로 대체) (임상관찰기록/간호일지)'},
+  {num:20, sec:null, text:'통증 재평가를 위해 1시간 이내 방문 계획임을 환자에게 설명한다.'},
 ];
 
-const SEC_IDS = {'상황② Ambroxol':'sec-s2','상황③ Cefazolin':'sec-s3',
+const SEC_IDS = {'상황① MD apidra SC 투약':'sec-s1','상황② 1P AAP PO 투약':'sec-s2','상황③ 3P Ketoprofen PRN IM 투약':'sec-s3',
   '상황① C-line 삽입 시술 전후':   'sec-s1',
   '상황② 중심정맥관 사용':          'sec-s2',
   '상황③ 수혈':                     'sec-s3',
@@ -310,6 +302,7 @@ function toggle(num, val) {
     const b = document.getElementById('btn-'+num+'-'+v);
     if (b) b.className = 'check-btn' + (c[v]?' active-'+v.toLowerCase():'');
   });
+  // 체크 시 미체크 강조 해제
   const anyChecked = c.Y || c.N || c.D;
   const btn = document.getElementById('btn-'+num+'-Y');
   if (btn) {
@@ -385,18 +378,22 @@ function showToast(msg) {
 }
 
 function openResult() {
+  // 미체크 항목 찾기 (sec-header 행 제외, 실제 데이터 행만)
   const unchecked = ITEMS.filter(item => {
     const c = checks[item.num];
     return !c || (!c.Y && !c.N && !c.D);
   });
 
+  // 기존 강조 초기화
   document.querySelectorAll('tr.row-missing').forEach(r => r.classList.remove('row-missing'));
 
   if (unchecked.length > 0) {
+    // 미체크 행 강조
     unchecked.forEach(item => {
       const btns = document.getElementById('btn-'+item.num+'-Y');
       if (btns) btns.closest('tr').classList.add('row-missing');
     });
+    // 첫 번째 미체크 항목으로 스크롤
     const firstBtn = document.getElementById('btn-'+unchecked[0].num+'-Y');
     if (firstBtn) firstBtn.closest('tr').scrollIntoView({behavior:'smooth', block:'center'});
     showToast(`미체크 항목이 ${unchecked.length}개 있습니다. (연번 ${unchecked.map(i=>i.num).join(', ')})`);
